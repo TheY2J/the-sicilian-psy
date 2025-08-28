@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -104,6 +104,37 @@
             color: #a0aec0;
         }
 
+        .form-input.error {
+            border-color: #e53e3e;
+            background: #fef5f5;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            color: #38a169;
+            font-size: 14px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f0fff4;
+            border-radius: 8px;
+            border-left: 4px solid #38a169;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
         .checkbox-group {
             display: flex;
             align-items: center;
@@ -122,7 +153,7 @@
             color: #4a5568;
         }
 
-        .signin-button {
+        .auth-button {
             width: 100%;
             padding: 16px;
             background: #2d3748;
@@ -134,12 +165,40 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 25px;
+            position: relative;
         }
 
-        .signin-button:hover {
+        .auth-button:hover:not(:disabled) {
             background: #1a202c;
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(45, 55, 72, 0.3);
+        }
+
+        .auth-button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        .auth-button.loading .loading-spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .form-links {
@@ -152,6 +211,7 @@
             text-decoration: none;
             font-size: 14px;
             margin: 0 10px;
+            cursor: pointer;
         }
 
         .form-links a:hover {
@@ -305,6 +365,15 @@
             justify-content: center;
             font-size: 12px;
             font-weight: 600;
+        }
+
+        /* Hidden fields for signup */
+        .signup-fields {
+            display: none;
+        }
+
+        .signup-fields.show {
+            display: block;
         }
 
         /* Popup Styles */
@@ -613,29 +682,57 @@
                 <span class="brand-name">NeuroVR</span>
             </div>
             
-            <h1 class="form-title">Sign in</h1>
+            <h1 class="form-title" id="formTitle">Sign in</h1>
             
-            <form>
+            <div class="success-message" id="successMessage"></div>
+            
+            <form id="authForm">
+                <div class="signup-fields" id="signupFields">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" id="fullName" name="fullName" placeholder="John Doe">
+                        <div class="error-message" id="fullNameError"></div>
+                    </div>
+                </div>
+                
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
-                    <input type="email" class="form-input" placeholder="john.doe@example.com">
+                    <input type="email" class="form-input" id="email" name="email" placeholder="john.doe@example.com" required>
+                    <div class="error-message" id="emailError"></div>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" class="form-input" placeholder="••••••••">
+                    <input type="password" class="form-input" id="password" name="password" placeholder="••••••••" required>
+                    <div class="error-message" id="passwordError"></div>
                 </div>
                 
-                <div class="checkbox-group">
+                <div class="signup-fields" id="signupFields2">
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-input" id="confirmPassword" name="confirmPassword" placeholder="••••••••">
+                        <div class="error-message" id="confirmPasswordError"></div>
+                    </div>
+                </div>
+                
+                <div class="checkbox-group" id="rememberGroup">
                     <input type="checkbox" class="checkbox" id="remember">
                     <label for="remember" class="checkbox-label">Remember me</label>
                 </div>
                 
-                <button type="submit" class="signin-button">Sign in</button>
+                <div class="checkbox-group signup-fields" id="termsGroup">
+                    <input type="checkbox" class="checkbox" id="terms" name="terms">
+                    <label for="terms" class="checkbox-label">I agree to the Terms of Service and Privacy Policy</label>
+                </div>
+                
+                <button type="submit" class="auth-button" id="authButton">
+                    <span class="loading-spinner"></span>
+                    <span id="buttonText">Sign in</span>
+                </button>
                 
                 <div class="form-links">
-                    <a href="#">Don't have an account? Sign up</a>
-                    <a href="#">Forgot Password</a>
+                    <a id="toggleAuthMode">Don't have an account? Sign up</a>
+                    <a href="#" id="forgotPassword">Forgot Password</a>
                 </div>
                 
                 <div class="social-login">
@@ -808,11 +905,294 @@
             <div class="popup-section">
                 <h3>Why Choose NeuroVR?</h3>
                 <p>Traditional therapy meets innovative technology. Our platform provides a comfortable, accessible way to work through mental health challenges with the guidance of trained professionals and the power of immersive experiences.</p>
+                <p>Join over 5,000 individuals who have found healing and support through our revolutionary approach to mental wellness.</p>
             </div>
         </div>
     </div>
 
     <script>
+        // Authentication state
+        let isSignUpMode = false;
+        
+        // DOM elements
+        const authForm = document.getElementById('authForm');
+        const formTitle = document.getElementById('formTitle');
+        const authButton = document.getElementById('authButton');
+        const buttonText = document.getElementById('buttonText');
+        const toggleAuthMode = document.getElementById('toggleAuthMode');
+        const signupFields = document.querySelectorAll('.signup-fields');
+        const rememberGroup = document.getElementById('rememberGroup');
+        const forgotPassword = document.getElementById('forgotPassword');
+        const successMessage = document.getElementById('successMessage');
+
+        // Form inputs
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const termsInput = document.getElementById('terms');
+
+        // Error elements
+        const fullNameError = document.getElementById('fullNameError');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+        const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+        // Toggle between sign in and sign up
+        toggleAuthMode.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleMode();
+        });
+
+        function toggleMode() {
+            isSignUpMode = !isSignUpMode;
+            
+            if (isSignUpMode) {
+                formTitle.textContent = 'Sign up';
+                buttonText.textContent = 'Sign up';
+                toggleAuthMode.textContent = 'Already have an account? Sign in';
+                signupFields.forEach(field => field.classList.add('show'));
+                rememberGroup.style.display = 'none';
+                forgotPassword.style.display = 'none';
+            } else {
+                formTitle.textContent = 'Sign in';
+                buttonText.textContent = 'Sign in';
+                toggleAuthMode.textContent = "Don't have an account? Sign up";
+                signupFields.forEach(field => field.classList.remove('show'));
+                rememberGroup.style.display = 'flex';
+                forgotPassword.style.display = 'inline';
+            }
+            
+            clearErrors();
+            clearForm();
+        }
+
+        // Form submission
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const formData = new FormData(authForm);
+            const userData = Object.fromEntries(formData.entries());
+            
+            try {
+                setLoading(true);
+                
+                if (isSignUpMode) {
+                    await signUp(userData);
+                } else {
+                    await signIn(userData);
+                }
+                
+            } catch (error) {
+                showError('email', error.message);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // Validation functions
+        function validateForm() {
+            let isValid = true;
+            clearErrors();
+            
+            // Email validation
+            if (!emailInput.value.trim()) {
+                showError('email', 'Email is required');
+                isValid = false;
+            } else if (!isValidEmail(emailInput.value)) {
+                showError('email', 'Please enter a valid email address');
+                isValid = false;
+            }
+            
+            // Password validation
+            if (!passwordInput.value.trim()) {
+                showError('password', 'Password is required');
+                isValid = false;
+            } else if (passwordInput.value.length < 6) {
+                showError('password', 'Password must be at least 6 characters long');
+                isValid = false;
+            }
+            
+            if (isSignUpMode) {
+                // Full name validation
+                if (!fullNameInput.value.trim()) {
+                    showError('fullName', 'Full name is required');
+                    isValid = false;
+                }
+                
+                // Confirm password validation
+                if (!confirmPasswordInput.value.trim()) {
+                    showError('confirmPassword', 'Please confirm your password');
+                    isValid = false;
+                } else if (passwordInput.value !== confirmPasswordInput.value) {
+                    showError('confirmPassword', 'Passwords do not match');
+                    isValid = false;
+                }
+                
+                // Terms validation
+                if (!termsInput.checked) {
+                    showError('email', 'You must accept the Terms of Service and Privacy Policy');
+                    isValid = false;
+                }
+            }
+            
+            return isValid;
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function showError(fieldName, message) {
+            const input = document.getElementById(fieldName);
+            const errorElement = document.getElementById(fieldName + 'Error');
+            
+            input.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+
+        function clearErrors() {
+            const inputs = document.querySelectorAll('.form-input');
+            const errors = document.querySelectorAll('.error-message');
+            
+            inputs.forEach(input => input.classList.remove('error'));
+            errors.forEach(error => {
+                error.textContent = '';
+                error.classList.remove('show');
+            });
+            
+            successMessage.classList.remove('show');
+        }
+
+        function clearForm() {
+            authForm.reset();
+        }
+
+        function setLoading(loading) {
+            authButton.disabled = loading;
+            if (loading) {
+                authButton.classList.add('loading');
+            } else {
+                authButton.classList.remove('loading');
+            }
+        }
+
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.add('show');
+        }
+
+        // API functions
+        async function signUp(userData) {
+            const response = await fetch('/.netlify/functions/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: userData.fullName,
+                    email: userData.email,
+                    password: userData.password
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message || 'Sign up failed');
+            }
+            
+            showSuccess('Account created successfully! Please sign in to continue.');
+            setTimeout(() => {
+                toggleMode(); // Switch to sign in mode
+            }, 2000);
+        }
+
+        async function signIn(userData) {
+            const response = await fetch('/.netlify/functions/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: userData.email,
+                    password: userData.password
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message || 'Sign in failed');
+            }
+            
+            // Store token in sessionStorage (not localStorage due to artifact restrictions)
+            if (typeof(Storage) !== "undefined") {
+                try {
+                    sessionStorage.setItem('neurovr_token', result.token);
+                    sessionStorage.setItem('neurovr_user', JSON.stringify(result.user));
+                } catch (e) {
+                    // Fallback for environments without sessionStorage
+                    console.log('Session storage not available, using memory storage');
+                }
+            }
+            
+            showSuccess('Welcome back! Redirecting to dashboard...');
+            
+            setTimeout(() => {
+                // Redirect to dashboard (you would implement this)
+                window.location.href = '/dashboard.html';
+            }, 2000);
+        }
+
+        // Forgot password functionality
+        forgotPassword.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            if (!email) {
+                showError('email', 'Please enter your email address first');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showError('email', 'Please enter a valid email address');
+                return;
+            }
+            
+            try {
+                setLoading(true);
+                
+                const response = await fetch('/.netlify/functions/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to send reset email');
+                }
+                
+                showSuccess('Password reset email sent! Please check your inbox.');
+                
+            } catch (error) {
+                showError('email', error.message);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // About popup functions
         function openAboutPopup() {
             document.getElementById('aboutPopup').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -836,27 +1216,20 @@
                 closeAboutPopup();
             }
         });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already signed in
+            try {
+                const token = sessionStorage.getItem('neurovr_token');
+                if (token) {
+                    // Redirect to dashboard if already signed in
+                    window.location.href = '/dashboard.html';
+                }
+            } catch (e) {
+                // sessionStorage not available, continue normally
+            }
+        });
     </script>
-    <script>
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const email = document.querySelector("input[type=email]").value;
-  const password = document.querySelector("input[type=password]").value;
-
-  const res = await fetch("/.netlify/functions/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
-
-  const data = await res.json();
-  if (data.success) {
-    alert("✅ Login successful! User ID: " + data.userId);
-  } else {
-    alert("❌ " + data.message);
-  }
-});
-</script>
 </body>
 </html>
