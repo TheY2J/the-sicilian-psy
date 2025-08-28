@@ -615,15 +615,15 @@
             
             <h1 class="form-title">Sign in</h1>
             
-            <form>
+            <form id="loginForm">
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
-                    <input type="email" class="form-input" placeholder="john.doe@example.com">
+                    <input type="email" id="email" class="form-input" placeholder="john.doe@example.com">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" class="form-input" placeholder="••••••••">
+                    <input type="password" id="password" class="form-input" placeholder="••••••••">
                 </div>
                 
                 <div class="checkbox-group">
@@ -838,5 +838,23 @@
             }
         });
     </script>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        // Default test credentials
+        if(email === "test@neurovr.com" && password === "password123") {
+            // Redirect to dashboard
+            window.location.href = "dashboard_ff.html";
+        } else {
+            alert("Invalid credentials. Try:\nEmail: test@neurovr.com\nPassword: password123");
+        }
+    });
+</script>
+
 </body>
 </html>
