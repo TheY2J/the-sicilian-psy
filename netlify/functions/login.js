@@ -1,34 +1,43 @@
-mport { Client } from "pg";
+import pkg from "pg";
+import bcrypt from "bcrypt";
 
-export async function handler(event) {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
+const { Pool } = pkg;
 
+const pool = new Pool({
+  connectionString: process.env.NEON_DB_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+export async function handler(event, context) {
   try {
     const { email, password } = JSON.parse(event.body);
 
-    const client = new Client({
-      connectionString: process.env.DATABASE_URL, // store in Netlify env vars
-      ssl: { rejectUnauthorized: false },
-    });
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    if (result.rows.length === 0) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ success: false, message: "User not found" })
+      };
+    }
 
-    await client.connect();
-
-    // insert or check user login
-    const res = await client.query(
-      "INSERT INTO users(email, password) VALUES($1, crypt($2, gen_salt('bf'))) RETURNING id",
-      [email, password]
-    );
-
-    await client.end();
+    const user = result.rows[0];
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ success: false, message: "Invalid password" })
+      };
+    }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, userId: res.rows[0].id }),
+      body: JSON.stringify({ success: true, message: "Login successful", userId: user.id })
     };
   } catch (err) {
-    console.error(err);
-    return { statusCode: 500, body: "Server Error" };
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ success: false, error: err.message })
+    };
   }
 }
+
