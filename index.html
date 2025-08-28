@@ -837,5 +837,26 @@
             }
         });
     </script>
+    <script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = document.querySelector("input[type=email]").value;
+  const password = document.querySelector("input[type=password]").value;
+
+  const res = await fetch("/.netlify/functions/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    alert("✅ Login successful! User ID: " + data.userId);
+  } else {
+    alert("❌ " + data.message);
+  }
+});
+</script>
 </body>
 </html>
