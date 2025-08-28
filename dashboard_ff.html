@@ -1,532 +1,1207 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <title>NeuroVR - Dashboard</title>
 
+
+
   <style>
+
     /* ========== Base Reset ========== */
+
     *{margin:0;padding:0;box-sizing:border-box}
 
+
+
     /* ========== Theme ========== */
-    body{
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-      background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#2d2d2d 100%);
-      color:#fff;min-height:100vh;overflow-x:hidden
+
+    :root {
+
+      --primary-color: #8b8afc;
+
+      --primary-gradient: linear-gradient(135deg,#4f46e5,#7c3aed);
+
+      --bg-gradient: linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#2d2d2d 100%);
+
+      --card-bg: rgba(255,255,255,.04);
+
+      --card-border: rgba(255,255,255,.08);
+
+      --text-primary: #fff;
+
+      --text-secondary: #cfcfd6;
+
     }
+
+
+
+    body{
+
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+
+      background:var(--bg-gradient);
+
+      color:var(--text-primary);min-height:100vh;overflow-x:hidden;
+
+      transition: background 0.3s ease;
+
+    }
+
+
+
+    body.light-theme {
+
+      --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 50%, #c3cfe2 100%);
+
+      --card-bg: rgba(255,255,255,.8);
+
+      --card-border: rgba(0,0,0,.08);
+
+      --text-primary: #2d3748;
+
+      --text-secondary: #4a5568;
+
+    }
+
+
 
     /* ========== Navbar ========== */
+
     .navbar{
+
       background:rgba(0,0,0,.9);
+
       backdrop-filter:blur(20px);
+
       padding:15px 30px;display:flex;justify-content:space-between;align-items:center;
+
       border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:100
+
     }
-    .logo{display:flex;align-items:center;gap:12px;font-size:28px;font-weight:800;color:#8b8afc;letter-spacing:.3px}
+
+    .logo{display:flex;align-items:center;gap:12px;font-size:28px;font-weight:800;color:var(--primary-color);letter-spacing:.3px}
+
     .logo-icon{width:32px;height:32px;background-image:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%238b8afc"><circle cx="20" cy="30" r="3"/><circle cx="50" cy="30" r="3"/><circle cx="80" cy="30" r="3"/><ellipse cx="50" cy="50" rx="25" ry="8" fill="none" stroke="%238b8afc" stroke-width="2"/><circle cx="20" cy="70" r="3"/><circle cx="50" cy="70" r="3"/><circle cx="80" cy="70" r="3"/><line x1="20" y1="30" x2="20" y2="70" stroke="%238b8afc" stroke-width="1.5"/><line x1="50" y1="30" x2="50" y2="42" stroke="%238b8afc" stroke-width="1.5"/><line x1="50" y1="58" x2="50" y2="70" stroke="%238b8afc" stroke-width="1.5"/><line x1="80" y1="30" x2="80" y2="70" stroke="%238b8afc" stroke-width="1.5"/><line x1="20" y1="30" x2="35" y2="42" stroke="%238b8afc" stroke-width="1.5"/><line x1="80" y1="30" x2="65" y2="42" stroke="%238b8afc" stroke-width="1.5"/><line x1="20" y1="70" x2="35" y2="58" stroke="%238b8afc" stroke-width="1.5"/><line x1="80" y1="70" x2="65" y2="58" stroke="%238b8afc" stroke-width="1.5"/></svg>');
+
       background-size:contain;background-repeat:no-repeat}
+
     .nav-links{display:flex;gap:24px;align-items:center}
+
     .nav-link{
+
       color:#aaa;text-decoration:none;font-weight:600;padding:8px 14px;border-radius:10px;cursor:pointer;
+
       transition:all .25s ease
+
     }
-    .nav-link:hover,.nav-link.active{color:#8b8afc;background:rgba(139,138,252,.12)}
+
+    .nav-link:hover,.nav-link.active{color:var(--primary-color);background:rgba(139,138,252,.12)}
+
     .user-profile{display:flex;align-items:center;gap:12px;cursor:pointer;padding:8px 12px;border-radius:12px;position:relative;transition:.25s}
+
     .user-profile:hover{background:rgba(255,255,255,.05)}
+
     .user-avatar{width:40px;height:40px;border-radius:50%;
-      background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:800}
+
+      background:var(--primary-gradient);display:flex;align-items:center;justify-content:center;font-weight:800}
+
     .user-info{display:flex;flex-direction:column}
+
     .user-name{font-weight:700;font-size:14px}
+
     .user-status{font-size:12px;color:#9aa}
+
     /* dropdown */
+
     .profile-dropdown{
+
       position:absolute;top:56px;right:0;display:none;min-width:220px;
+
       background:rgba(15,15,18,.95);backdrop-filter:blur(16px);
+
       border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.4)
+
     }
+
     .profile-dropdown.show{display:block}
-    .dropdown-item{padding:12px 14px;font-size:14px;color:#d8d8df;transition:.2s}
+
+    .dropdown-item{padding:12px 14px;font-size:14px;color:#d8d8df;transition:.2s; cursor: pointer;}
+
     .dropdown-item:hover{background:rgba(139,138,252,.12);color:#fff}
 
+
+
     /* ========== Layout ========== */
+
     .container{max-width:1400px;margin:0 auto;padding:28px}
+
     .main-content{display:none}
+
     .main-content.active{display:block}
+
     .dashboard-grid{display:grid;grid-template-columns:1fr 340px;gap:28px;margin-bottom:28px}
+
     .content-area{display:flex;flex-direction:column;gap:28px}
 
+
+
     /* ========== Cards / Sections ========== */
+
     .card{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.25)
+
+      background:var(--card-bg);
+
+      border:1px solid var(--card-border);
+
+      border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.25);
+
+      transition: background 0.3s ease, border 0.3s ease;
+
     }
+
     .welcome-section{
+
       position:relative;overflow:hidden
+
     }
+
     .welcome-section::before{
+
       content:'';position:absolute;inset:0;
+
       background:radial-gradient(1000px 400px at -10% -10%, rgba(139,138,252,.25), transparent 60%),
+
                  radial-gradient(800px 400px at 110% 120%, rgba(124,58,237,.18), transparent 60%);
+
       pointer-events:none
+
     }
+
     .welcome-content h2{
+
       font-size:28px;margin-bottom:10px;
+
       background:linear-gradient(135deg,#8b8afc,#b794f6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent
+
     }
-    .welcome-content p{color:#cfcfd6;line-height:1.6}
+
+    .welcome-content p{color:var(--text-secondary);line-height:1.6}
+
+
 
     .therapy-sessions .sessions-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+
     .sessions-title{font-size:22px;font-weight:800}
 
+
+
     .sessions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+
     .session-card{
+
       background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+
       border:1px solid rgba(255,255,255,.07);
+
       border-radius:16px;padding:22px;cursor:pointer;position:relative;overflow:hidden;
+
       transition:transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s, border-color .3s
+
     }
+
     .session-card::after{
+
       content:'';position:absolute;inset:auto -40% -40% auto;width:160px;height:160px;border-radius:50%;
+
       background:radial-gradient(60px 60px at 50% 50%,rgba(139,138,252,.5),transparent 70%);filter:blur(10px);opacity:.35;transition:.3s
+
     }
+
     .session-card:hover{transform:translateY(-6px) scale(1.015);border-color:rgba(139,138,252,.45);box-shadow:0 18px 40px rgba(79,70,229,.18)}
+
+    .session-card:hover::after {
+
+      transform: scale(1.2);
+
+      opacity: 0.5;
+
+    }
+
     .session-icon{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px}
+
     .session-card.heights .session-icon{background:linear-gradient(135deg,#ef4444,#dc2626)}
+
     .session-card.flights .session-icon{background:linear-gradient(135deg,#06b6d4,#0891b2)}
+
     .session-card.darkness .session-icon{background:linear-gradient(135deg,#6b7280,#374151)}
+
     .session-title{font-weight:800;font-size:18px;margin-bottom:6px}
+
     .session-description{color:#a9a9b8;font-size:14px;line-height:1.55;margin-bottom:12px}
+
     .session-stats{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+
     .session-duration{font-size:12px;color:#8c8c9a}
+
     .session-difficulty{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.3px}
+
     .difficulty-beginner{background:rgba(34,197,94,.18);color:#22c55e;border:1px solid rgba(34,197,94,.28)}
+
     .difficulty-intermediate{background:rgba(245,158,11,.18);color:#f59e0b;border:1px solid rgba(245,158,11,.28)}
+
     .difficulty-advanced{background:rgba(239,68,68,.18);color:#ef4444;border:1px solid rgba(239,68,68,.28)}
 
+
+
     .action-btn{
+
       background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.05));
+
       border:1px solid rgba(255,255,255,.12);color:#fff;padding:12px 16px;border-radius:12px;
+
       font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:10px;cursor:pointer;transition:.25s
+
     }
+
     .action-btn:hover{transform:translateY(-2px);border-color:rgba(139,138,252,.5);box-shadow:0 10px 24px rgba(79,70,229,.2)}
-    .action-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none}
+
+    .action-primary{background:var(--primary-gradient);border:none}
+
+
 
     /* Recent Sessions */
+
     .recent-sessions .session-history-item{
+
       display:flex;justify-content:space-between;align-items:center;padding:14px 16px;margin-bottom:12px;
+
       background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;transition:.25s;cursor:pointer
+
     }
+
     .recent-sessions .session-history-item:hover{background:rgba(255,255,255,.06);border-color:rgba(139,138,252,.25)}
+
     .session-history-info{display:flex;flex-direction:column;gap:4px}
+
     .session-history-title{font-weight:700;font-size:14px}
+
     .session-history-date{color:#9aa;font-size:12px}
+
     .session-success-rate{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(34,197,94,.18);color:#22c55e;border:1px solid rgba(34,197,94,.28)}
 
+
+
     /* Sidebar */
+
     .sidebar{display:flex;flex-direction:column;gap:22px}
+
     .stats-header{font-size:16px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+
     .stat-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+
     .stat-item:last-child{border-bottom:0}
+
     .stat-label{color:#a9a9b8;font-size:13px}
+
     .stat-value{font-weight:800}
+
     .ring-wrap{display:flex;align-items:center;gap:14px}
+
     .progress-ring{--p:70; /* default */ width:88px;height:88px;border-radius:50%;
+
       background:conic-gradient(#8b8afc calc(var(--p)*1%), rgba(255,255,255,.08) 0);
-      display:flex;align-items:center;justify-content:center;position:relative
+
+      display:flex;align-items:center;justify-content:center;position:relative;
+
+      transition: background 1s ease-in-out;
+
     }
+
     .progress-ring::before{content:'';width:66px;height:66px;border-radius:50%;background:#1a1a1a;border:1px solid rgba(255,255,255,.06)}
+
     .progress-text{position:absolute;font-weight:800;font-size:14px}
 
+
+
     /* Reports / Analytics / Profile */
+
     .reports-grid,.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:18px}
+
     .report-card,.analytics-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px;transition:.25s}
+
     .report-card:hover,.analytics-card:hover{transform:translateY(-3px);border-color:rgba(139,138,252,.35)}
+
     .report-title{font-weight:800;margin-bottom:6px}
+
     .report-date{color:#9aa;font-size:12px;margin-bottom:10px}
+
     .report-summary{color:#cfcfd6;font-size:14px;line-height:1.5}
+
     .chart-placeholder{height:200px;border-radius:10px;border:1px dashed rgba(139,138,252,.4);background:rgba(139,138,252,.10);
+
       display:flex;align-items:center;justify-content:center;color:#a9a9b8;margin-top:12px}
 
+
+
     /* Modal */
+
     .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);z-index:1000}
+
     .modal.show{display:flex}
+
     .modal-content{width:min(480px,92vw);background:linear-gradient(135deg,#1b1b1f,#26262c);
+
       border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.5);position:relative}
+
     .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+
     .modal-title{font-size:20px;font-weight:800}
+
     .close-btn{background:none;border:none;color:#9aa;font-size:24px;cursor:pointer}
+
     .close-btn:hover{color:#fff}
+
     .modal-body{margin:10px 0 16px 0;color:#cfcfd6;line-height:1.6}
-    .start-session-btn{width:100%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;padding:14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.25s}
+
+    .start-session-btn{width:100%;background:var(--primary-gradient);color:#fff;border:none;padding:14px;border-radius:12px;font-weight:800;cursor:pointer;transition:.25s}
+
     .start-session-btn:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(79,70,229,.25)}
 
+
+
     /* Toast */
+
     .notification{position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#22c55e,#16a34a);
+
       color:#fff;padding:14px 18px;border-radius:12px;z-index:1200;transform:translateX(120%);transition:transform .3s ease;box-shadow:0 14px 30px rgba(0,0,0,.35)}
+
     .notification.show{transform:translateX(0)}
 
+
+
     /* Responsive */
+
     @media (max-width:1024px){.dashboard-grid{grid-template-columns:1fr}.container{padding:18px}}
+
     @media (max-width:768px){
+
       .navbar{padding:12px 16px;flex-direction:column;gap:10px}
+
       .nav-links{order:-1;gap:10px;flex-wrap:wrap;justify-content:center}
+
       .logo{font-size:24px}
+
       .user-info{display:none}
+
     }
+
   </style>
+
 </head>
 
+
+
 <body>
+
   <!-- Navbar -->
+
   <div class="navbar">
+
     <div class="logo"><div class="logo-icon"></div>NeuroVR</div>
+
     <div class="nav-links">
+
       <div class="nav-link active" data-target="dashboard">Dashboard</div>
+
       <div class="nav-link" data-target="profile">Profile</div>
+
       <div class="nav-link" data-target="reports">Reports</div>
+
       <div class="nav-link" data-target="analytics">Analytics</div>
+
     </div>
+
+
 
     <div class="user-profile" id="userProfile">
+
       <div class="user-info">
+
         <div class="user-name">John Doe</div>
+
         <div class="user-status">Premium Member</div>
+
       </div>
+
       <div class="user-avatar">JD</div>
 
+
+
       <!-- Dropdown -->
+
       <div class="profile-dropdown" id="profileDropdown">
+
         <div class="dropdown-item" data-target="profile">👤 View Profile</div>
+
         <div class="dropdown-item" data-target="reports">📊 My Reports</div>
+
         <div class="dropdown-item" id="themeToggle">🌓 Toggle Theme</div>
+
         <div class="dropdown-item" id="logoutBtn">🚪 Logout</div>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- Toast -->
-  <div class="notification" id="toast">✔️ Action completed.</div>
+
+  <div class="notification" id="toast">✔ Action completed.</div>
+
+
 
   <!-- Main Container -->
+
   <div class="container">
 
+
+
     <!-- ===== Dashboard ===== -->
+
     <div id="dashboard" class="main-content active">
+
       <div class="dashboard-grid">
+
         <div class="content-area">
 
+
+
           <div class="card welcome-section">
+
             <div class="welcome-content">
+
               <h2>Welcome back, John!</h2>
+
               <p>Your journey to overcoming anxiety and phobias continues. Track your progress, start new therapy sessions, and take control of your mental wellness with our immersive VR therapy platform.</p>
+
             </div>
+
           </div>
+
+
 
           <div class="card therapy-sessions">
+
             <div class="sessions-header">
+
               <h3 class="sessions-title">Available Therapy Sessions</h3>
+
               <button class="action-btn action-primary" id="refreshBtn">🔄 Refresh</button>
+
             </div>
+
+
 
             <div class="sessions-grid">
+
               <div class="session-card heights" data-session="Fear of Heights">
+
                 <div class="session-icon">🏔</div>
+
                 <div class="session-title">Fear of Heights</div>
+
                 <div class="session-description">Gradual exposure to height scenarios in a controlled VR environment. Build confidence step by step.</div>
+
                 <div class="session-stats">
+
                   <div class="session-duration">15–30 min</div>
+
                   <div class="session-difficulty difficulty-beginner">Beginner</div>
+
                 </div>
+
               </div>
+
+
 
               <div class="session-card flights" data-session="Fear of Flying">
-                <div class="session-icon">✈️</div>
+
+                <div class="session-icon">✈</div>
+
                 <div class="session-title">Fear of Flying</div>
+
                 <div class="session-description">Experience realistic flight scenarios from takeoff to landing. Overcome aviation anxiety safely.</div>
+
                 <div class="session-stats">
+
                   <div class="session-duration">20–40 min</div>
+
                   <div class="session-difficulty difficulty-intermediate">Intermediate</div>
+
                 </div>
+
               </div>
+
+
 
               <div class="session-card darkness" data-session="Fear of Darkness">
+
                 <div class="session-icon">🌙</div>
+
                 <div class="session-title">Fear of Darkness</div>
+
                 <div class="session-description">Explore dark environments gradually. Build comfort and reduce anxiety in low-light situations.</div>
+
                 <div class="session-stats">
+
                   <div class="session-duration">10–25 min</div>
+
                   <div class="session-difficulty difficulty-advanced">Advanced</div>
+
                 </div>
+
               </div>
+
             </div>
+
           </div>
+
+
 
           <div class="card recent-sessions">
+
             <div class="sessions-header">
+
               <h3>Recent Session History</h3>
+
               <button class="action-btn" data-target="reports">📊 View All Reports</button>
+
+            </div>
+
+
+
+            <div class="session-history-item">
+
+              <div class="session-history-info">
+
+                <div class="session-history-title">Fear of Heights — Session 3</div>
+
+                <div class="session-history-date">Yesterday, 2:30 PM</div>
+
+              </div>
+
+              <div class="session-success-rate">85% Success</div>
+
             </div>
 
             <div class="session-history-item">
+
               <div class="session-history-info">
-                <div class="session-history-title">Fear of Heights — Session 3</div>
-                <div class="session-history-date">Yesterday, 2:30 PM</div>
-              </div>
-              <div class="session-success-rate">85% Success</div>
-            </div>
-            <div class="session-history-item">
-              <div class="session-history-info">
+
                 <div class="session-history-title">Fear of Flying — Session 2</div>
+
                 <div class="session-history-date">3 days ago, 4:15 PM</div>
+
               </div>
+
               <div class="session-success-rate" style="background:rgba(245,158,11,.18);color:#f59e0b;border-color:rgba(245,158,11,.28)">72% Success</div>
+
             </div>
+
             <div class="session-history-item">
+
               <div class="session-history-info">
+
                 <div class="session-history-title">Fear of Darkness — Session 1</div>
+
                 <div class="session-history-date">1 week ago, 6:45 PM</div>
+
               </div>
+
               <div class="session-success-rate" style="background:rgba(239,68,68,.18);color:#ef4444;border-color:rgba(239,68,68,.28)">68% Success</div>
+
             </div>
+
           </div>
+
         </div>
+
+
 
         <!-- Sidebar -->
+
         <aside class="sidebar">
+
           <div class="card">
+
             <div class="stats-header">📈 Progress Overview</div>
+
             <div class="stat-item"><span class="stat-label">Completed Sessions</span><span class="stat-value">12</span></div>
+
             <div class="stat-item"><span class="stat-label">Success Rate</span><span class="stat-value">78%</span></div>
+
             <div class="stat-item"><span class="stat-label">Current Streak</span><span class="stat-value">5 days</span></div>
+
           </div>
 
+
+
           <div class="card">
+
             <div class="stats-header">🎯 Therapy Goal</div>
+
             <div class="ring-wrap">
+
               <div class="progress-ring" id="goalRing" style="--p:70">
+
                 <div class="progress-text" id="goalText">70%</div>
+
               </div>
+
               <div>
+
                 <div class="stat-label">Exposure Plan Completion</div>
+
                 <div class="stat-value">Level 4 of 6</div>
+
               </div>
+
             </div>
+
           </div>
 
+
+
           <div class="card">
+
             <div class="stats-header">⚡ Quick Actions</div>
+
             <div style="display:flex;flex-direction:column;gap:10px">
+
               <button class="action-btn" id="startBreathing">🧘 Start 4-7-8 Breathing</button>
+
               <button class="action-btn action-primary" id="newSession">➕ New Session</button>
+
               <button class="action-btn" id="exportReport">📤 Export Report</button>
+
             </div>
+
           </div>
+
         </aside>
+
       </div>
+
     </div>
+
+
 
     <!-- ===== Profile ===== -->
+
     <div id="profile" class="main-content">
+
       <div class="card" style="margin-bottom:18px">
+
         <div style="display:flex;align-items:center;gap:16px">
+
           <div class="user-avatar" style="width:64px;height:64px;font-size:22px">JD</div>
+
           <div>
+
             <div style="font-size:20px;font-weight:800">John Doe</div>
+
             <div style="color:#9aa;margin-top:4px">Member since Jan 2025</div>
+
           </div>
+
         </div>
+
       </div>
+
+
 
       <div class="reports-grid">
-        <div class="card">
-          <div class="report-title">Personal Info</div>
-          <div style="margin-top:12px;display:grid;gap:10px">
-            <label class="stat-label">Full Name</label>
-            <input class="action-btn" style="padding:10px;cursor:text" value="John Doe"/>
-            <label class="stat-label">Email</label>
-            <input class="action-btn" style="padding:10px;cursor:text" value="john.doe@email.com"/>
-            <label class="stat-label">Phone</label>
-            <input class="action-btn" style="padding:10px;cursor:text" value="+91 9876543210"/>
-            <button class="start-session-btn" id="saveProfile">Save Changes</button>
-          </div>
-        </div>
 
         <div class="card">
-          <div class="report-title">Preferences</div>
+
+          <div class="report-title">Personal Info</div>
+
           <div style="margin-top:12px;display:grid;gap:10px">
-            <label class="stat-label">Theme</label>
-            <select class="action-btn" id="themeSelect" style="cursor:pointer">
-              <option selected>Dark</option>
-              <option>Light</option>
-            </select>
-            <label class="stat-label">Notifications</label>
-            <select class="action-btn" id="notifSelect" style="cursor:pointer">
-              <option selected>Enabled</option>
-              <option>Disabled</option>
-            </select>
-            <button class="start-session-btn" id="savePrefs">Update Preferences</button>
+
+            <label class="stat-label">Full Name</label>
+
+            <input class="action-btn" style="padding:10px;cursor:text" value="John Doe"/>
+
+            <label class="stat-label">Email</label>
+
+            <input class="action-btn" style="padding:10px;cursor:text" value="john.doe@email.com"/>
+
+            <label class="stat-label">Phone</label>
+
+            <input class="action-btn" style="padding:10px;cursor:text" value="+91 9876543210"/>
+
+            <button class="start-session-btn" id="saveProfile">Save Changes</button>
+
           </div>
+
         </div>
+
+
+
+        <div class="card">
+
+          <div class="report-title">Preferences</div>
+
+          <div style="margin-top:12px;display:grid;gap:10px">
+
+            <label class="stat-label">Theme</label>
+
+            <select class="action-btn" id="themeSelect" style="cursor:pointer">
+
+              <option selected>Dark</option>
+
+              <option>Light</option>
+
+            </select>
+
+            <label class="stat-label">Notifications</label>
+
+            <select class="action-btn" id="notifSelect" style="cursor:pointer">
+
+              <option selected>Enabled</option>
+
+              <option>Disabled</option>
+
+            </select>
+
+            <button class="start-session-btn" id="savePrefs">Update Preferences</button>
+
+          </div>
+
+        </div>
+
       </div>
+
     </div>
+
+
 
     <!-- ===== Reports ===== -->
+
     <div id="reports" class="main-content">
+
       <div class="card">
+
         <h3 style="font-size:20px;font-weight:800">My Reports</h3>
+
         <div class="reports-grid">
+
           <div class="report-card">
+
             <div class="report-title">Weekly Progress</div>
+
             <div class="report-date">Aug 20, 2025</div>
+
             <div class="report-summary">You completed 3 sessions this week with an average success rate of 80%.</div>
+
           </div>
+
           <div class="report-card">
+
             <div class="report-title">Monthly Overview</div>
+
             <div class="report-date">Aug 2025</div>
+
             <div class="report-summary">A total of 12 sessions completed with consistent improvement noted.</div>
+
           </div>
+
           <div class="report-card">
+
             <div class="report-title">Trigger Analysis</div>
+
             <div class="report-date">Latest</div>
+
             <div class="report-summary">Peak triggers were heights > glass bridges; breathing reduced HR by ~18%.</div>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
+
+
 
     <!-- ===== Analytics ===== -->
+
     <div id="analytics" class="main-content">
+
       <div class="card">
+
         <h3 style="font-size:20px;font-weight:800">Analytics</h3>
+
         <div class="analytics-grid">
+
           <div class="analytics-card">
+
             <div style="font-weight:800">Session Success Rates</div>
+
             <div class="chart-placeholder">[Chart Placeholder]</div>
+
           </div>
+
           <div class="analytics-card">
+
             <div style="font-weight:800">Time Spent</div>
+
             <div class="chart-placeholder">[Chart Placeholder]</div>
+
           </div>
+
           <div class="analytics-card">
+
             <div style="font-weight:800">Heart Rate Trend</div>
+
             <div class="chart-placeholder">[Chart Placeholder]</div>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- ===== Session Modal ===== -->
+
   <div class="modal" id="sessionModal">
+
     <div class="modal-content">
+
       <div class="modal-header">
+
         <div class="modal-title" id="modalTitle">Start Session</div>
+
         <button class="close-btn" id="closeModal">&times;</button>
+
       </div>
+
       <div class="modal-body" id="modalBody">
-        You’re about to begin a guided VR exposure. Ensure your headset is connected and your play area is clear.
+
+        You're about to begin a guided VR exposure. Ensure your headset is connected and your play area is clear.
+
       </div>
+
       <button class="start-session-btn" id="startSessionBtn">Start Now</button>
+
     </div>
+
   </div>
 
+
+
   <script>
+
     // ===== Helpers =====
+
     const $ = (q,scope=document)=>scope.querySelector(q);
+
     const $$ = (q,scope=document)=>Array.from(scope.querySelectorAll(q));
+
     const toast = $('#toast');
 
+
+
     function showToast(msg='Done!'){
+
       toast.textContent = msg;
+
       toast.classList.add('show');
+
       setTimeout(()=>toast.classList.remove('show'), 2600);
+
     }
+
+
 
     // ===== Section Nav =====
+
     function activateSection(id){
+
       $$('.main-content').forEach(s=>s.classList.remove('active'));
+
       $('#'+id).classList.add('active');
+
       $$('.nav-link').forEach(n=>n.classList.remove('active'));
+
       const link = $(`.nav-link[data-target="${id}"]`);
+
       if(link) link.classList.add('active');
+
       // close dropdown if open
+
       $('#profileDropdown').classList.remove('show');
+
+      
+
+      // Save active section to localStorage
+
+      localStorage.setItem('activeSection', id);
+
     }
+
+
+
+    // Check for saved section on page load
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+      const savedSection = localStorage.getItem('activeSection') || 'dashboard';
+
+      activateSection(savedSection);
+
+    });
+
+
 
     $$('.nav-link').forEach(link=>{
+
       link.addEventListener('click',()=>activateSection(link.dataset.target));
+
     });
+
+
 
     // shortcuts from buttons with data-target
+
     document.addEventListener('click', (e)=>{
+
       const el = e.target.closest('[data-target]');
+
       if(el && !el.classList.contains('nav-link')){
+
         activateSection(el.dataset.target);
+
       }
+
     });
+
+
 
     // ===== Profile Dropdown =====
+
     const profileBtn = $('#userProfile');
+
     const dropdown = $('#profileDropdown');
+
     profileBtn.addEventListener('click', (e)=>{
+
       dropdown.classList.toggle('show');
+
       e.stopPropagation();
-    });
-    document.addEventListener('click',(e)=>{
-      if(!profileBtn.contains(e.target)) dropdown.classList.remove('show');
+
     });
 
-    $('#themeToggle').addEventListener('click', ()=>{
-      // simple playful toggle notice
-      showToast('Theme toggled ✨');
+    document.addEventListener('click',(e)=>{
+
+      if(!profileBtn.contains(e.target)) dropdown.classList.remove('show');
+
     });
+
+
+
+    // ===== Theme Toggle =====
+
+    const themeToggle = $('#themeToggle');
+
+    themeToggle.addEventListener('click', () => {
+
+      document.body.classList.toggle('light-theme');
+
+      const isLightTheme = document.body.classList.contains('light-theme');
+
+      localStorage.setItem('theme', isLightTheme ? 'light' : 'dark');
+
+      showToast(isLightTheme ? 'Light theme activated ☀️' : 'Dark theme activated 🌙');
+
+      dropdown.classList.remove('show');
+
+    });
+
+
+
+    // Check for saved theme preference
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+      const savedTheme = localStorage.getItem('theme');
+
+      if (savedTheme === 'light') {
+
+        document.body.classList.add('light-theme');
+
+        $('#themeSelect').value = 'Light';
+
+      }
+
+    });
+
+
+
+    // Theme select in profile
+
+    $('#themeSelect').addEventListener('change', (e) => {
+
+      if (e.target.value === 'Light') {
+
+        document.body.classList.add('light-theme');
+
+        localStorage.setItem('theme', 'light');
+
+      } else {
+
+        document.body.classList.remove('light-theme');
+
+        localStorage.setItem('theme', 'dark');
+
+      }
+
+    });
+
+
+
     $('#logoutBtn').addEventListener('click', ()=>showToast('Logged out'));
 
+
+
     // ===== Therapy Sessions (open modal) =====
+
     const modal = $('#sessionModal');
+
     const closeModal = $('#closeModal');
+
     const startBtn = $('#startSessionBtn');
 
+
+
     $$('.session-card').forEach(card=>{
+
       card.addEventListener('click', ()=>{
+
         const name = card.dataset.session || 'Therapy Session';
+
         $('#modalTitle').textContent = name;
-        $('#modalBody').textContent = `You’re starting "${name}". Put on your headset and follow the on-screen guidance.`;
+
+        $('#modalBody').textContent = `You're starting "${name}". Put on your headset and follow the on-screen guidance.`;
+
         modal.classList.add('show');
+
       });
+
     });
+
+
 
     closeModal.addEventListener('click', ()=>modal.classList.remove('show'));
+
     modal.addEventListener('click', (e)=>{ if(e.target === modal) modal.classList.remove('show'); });
 
+
+
     startBtn.addEventListener('click', ()=>{
+
       modal.classList.remove('show');
+
       showToast('Session started ✅');
+
     });
 
+
+
     // ===== Sidebar actions =====
+
     $('#refreshBtn').addEventListener('click', ()=>showToast('Sessions refreshed 🔄'));
-    $('#newSession').addEventListener('click', ()=>showToast('New session created ➕'));
+
+    $('#newSession').addEventListener('click', ()=>{
+
+      $('#modalTitle').textContent = 'New Session';
+
+      $('#modalBody').textContent = 'Create a custom therapy session tailored to your needs.';
+
+      modal.classList.add('show');
+
+    });
+
     $('#exportReport').addEventListener('click', ()=>showToast('Report exported 📤'));
-    $('#startBreathing').addEventListener('click', ()=>showToast('Breathing cycle started 🧘'));
-    $('#saveProfile').addEventListener('click', ()=>showToast('Profile saved ✔️'));
+
+    $('#startBreathing').addEventListener('click', ()=>{
+
+      showToast('Breathing cycle started 🧘');
+
+      // Simulate breathing exercise timer
+
+      setTimeout(() => showToast('Breathing cycle completed 🎉'), 5000);
+
+    });
+
+    $('#saveProfile').addEventListener('click', ()=>showToast('Profile saved ✔'));
+
     $('#savePrefs').addEventListener('click', ()=>showToast('Preferences updated 💾'));
 
+
+
     // ===== Progress Ring (demo animation to 70%) =====
+
     function animateRing(el, target=70, duration=900){
+
       const start = performance.now();
+
       function step(now){
+
         const p = Math.min((now - start)/duration, 1);
+
         const val = Math.round(p*target);
+
         el.style.setProperty('--p', val);
+
         $('#goalText').textContent = val + '%';
+
         if(p<1) requestAnimationFrame(step);
+
       }
+
       requestAnimationFrame(step);
+
     }
-    animateRing($('#goalRing'), 70);
+
+    
+
+    // Initialize progress ring animation
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+      animateRing($('#goalRing'), 70);
+
+    });
+
   </script>
+
 </body>
+
 </html>
