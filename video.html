@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroVR - Therapy Session</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .video-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo::before {
+            content: "";
+            width: 24px;
+            height: 24px;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="white"><circle cx="20" cy="30" r="3"/><circle cx="50" cy="30" r="3"/><circle cx="80" cy="30" r="3"/><ellipse cx="50" cy="50" rx="25" ry="8" fill="none" stroke="white" stroke-width="2"/><circle cx="20" cy="70" r="3"/><circle cx="50" cy="70" r="3"/><circle cx="80" cy="70" r="3"/><line x1="20" y1="30" x2="20" y2="70" stroke="white" stroke-width="1.5"/><line x1="50" y1="30" x2="50" y2="42" stroke="white" stroke-width="1.5"/><line x1="50" y1="58" x2="50" y2="70" stroke="white" stroke-width="1.5"/><line x1="80" y1="30" x2="80" y2="70" stroke="white" stroke-width="1.5"/><line x1="20" y1="30" x2="35" y2="42" stroke="white" stroke-width="1.5"/><line x1="80" y1="30" x2="65" y2="42" stroke="white" stroke-width="1.5"/><line x1="20" y1="70" x2="35" y2="58" stroke="white" stroke-width="1.5"/><line x1="80" y1="70" x2="65" y2="58" stroke="white" stroke-width="1.5"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .session-info {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .video-container {
+            flex: 1;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        #youtube-player {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .vr-icon {
+            width: 60px;
+            height: 60px;
+            background: #4f46e5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 20px 0;
+            background: rgba(15, 15, 15, 0.9);
+            border-radius: 16px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
+        }
+
+        .control-btn:hover {
+            background: linear-gradient(135deg, #333 0%, #222 100%);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .control-btn.primary {
+            background: linear-gradient(135deg, #ffffff 0%, #e5e5e5 100%);
+            color: #000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .control-btn.primary:hover {
+            background: linear-gradient(135deg, #f5f5f5 0%, #d5d5d5 100%);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+        }
+
+        .control-btn.danger {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            border: 1px solid #333;
+            color: #ff6b6b;
+        }
+
+        .control-btn.danger:hover {
+            background: linear-gradient(135deg, #2a1a1a 0%, #1f0f0f 100%);
+            border-color: #ff6b6b;
+            color: #ff8a8a;
+        }
+
+        .monitoring-panel {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .panel-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #4f46e5;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .metric-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .metric-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .heart-rate .metric-fill {
+            background: #ef4444;
+        }
+
+        .stress-level .metric-fill {
+            background: #f59e0b;
+        }
+
+        .engagement .metric-fill {
+            background: #10b981;
+        }
+
+        .session-progress .metric-fill {
+            background: #4f46e5;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #10b981;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .therapy-notes {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .notes-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .notes-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .reports-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .reports-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ffffff 0%, #e5e5e5 100%);
+            color: #000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .reports-btn.enabled {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .reports-btn.enabled::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .reports-btn.enabled:hover::before {
+            left: 100%;
+        }
+
+        .reports-btn.enabled:hover {
+            background: linear-gradient(135deg, #f5f5f5 0%, #d5d5d5 100%);
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+        }
+
+        .session-data {
+            display: none;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .emergency-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            color: #ff6b6b;
+            border: 1px solid #333;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emergency-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 107, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .emergency-btn:hover::before {
+            left: 100%;
+        }
+
+        .emergency-btn:hover {
+            background: linear-gradient(135deg, #2a1a1a 0%, #1f0f0f 100%);
+            border-color: #ff6b6b;
+            color: #ff8a8a;
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .monitoring-panel {
+                width: 100%;
+                max-height: 300px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="video-section">
+            <div class="header">
+                <div class="logo">NeuroVR</div>
+                <div class="session-info">
+                    <span>Session: Height Exposure Therapy</span>
+                    <span>Duration: <span id="timer">00:00</span></span>
+                    <span>Patient: John D.</span>
+                </div>
+            </div>
+
+            <div class="video-container">
+                <div class="video-placeholder" id="videoPlaceholder">
+                    <div class="vr-icon">🥽</div>
+                    <h3>VR Session Ready</h3>
+                    <p>Select a therapy scenario to begin</p>
+                </div>
+                <iframe id="youtube-player" style="display: none;"></iframe>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn primary" onclick="startSession()">
+                    <span>▶</span> Start Session
+                </button>
+                <button class="control-btn" onclick="pauseSession()">
+                    <span>⏸</span> Pause
+                </button>
+                <button class="control-btn" onclick="showScenarioSelect()">
+                    <span>🎬</span> Select Scenario
+                </button>
+                <button class="control-btn" onclick="adjustDifficulty()">
+                    <span>⚙</span> Adjust Difficulty
+                </button>
+                <button class="control-btn danger" onclick="stopSession()">
+                    <span>⏹</span> Stop Session
+                </button>
+            </div>
+        </div>
+
+        <div class="monitoring-panel">
+            <div class="panel-header">Real-time Monitoring</div>
+            
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Session Active - Monitoring Vitals</span>
+            </div>
+
+            <div class="metric-card heart-rate">
+                <div class="metric-title">Heart Rate</div>
+                <div class="metric-value"><span id="heartRate">72</span> BPM</div>
+                <div class="metric-bar">
+                    <div class="metric-fill" style="width: 60%"></div>
+                </div>
+            </div>
+
+            <div class="metric-card stress-level">
+                <div class="metric-title">Stress Level</div>
+                <div class="metric-value"><span id="stressLevel">3.2</span>/10</div>
+                <div class="metric-bar">
+                    <div class="metric-fill" style="width: 32%"></div>
+                </div>
+            </div>
+
+            <div class="metric-card engagement">
+                <div class="metric-title">Engagement Score</div>
+                <div class="metric-value"><span id="engagement">8.5</span>/10</div>
+                <div class="metric-bar">
+                    <div class="metric-fill" style="width: 85%"></div>
+                </div>
+            </div>
+
+            <div class="metric-card session-progress">
+                <div class="metric-title">Session Progress</div>
+                <div class="metric-value"><span id="progress">25</span>%</div>
+                <div class="metric-bar">
+                    <div class="metric-fill" style="width: 25%"></div>
+                </div>
+            </div>
+
+            <div class="therapy-notes">
+                <div class="notes-title">AI Recommendations</div>
+                <div class="notes-content">
+                    Patient showing good adaptation to current exposure level. Heart rate stable. Consider increasing difficulty in 2 minutes if stress levels remain low.
+                </div>
+            </div>
+
+            <div class="reports-section">
+                <button class="reports-btn" id="reportsBtn" onclick="generateReport()">
+                    📊 Generate AI Session Report
+                </button>
+                <div class="session-data" id="sessionData">
+                    <strong>Session Data Collected:</strong><br>
+                    • Heart Rate: <span id="dataPoints">0</span> data points<br>
+                    • Stress Measurements: <span id="stressPoints">0</span> readings<br>
+                    • Engagement Tracking: <span id="engagementPoints">0</span> samples<br>
+                    • Session Duration: <span id="totalDuration">0:00</span>
+                </div>
+            </div>
+
+            <button class="emergency-btn" onclick="emergencyStop()">
+                🚨 Emergency Stop
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let sessionActive = false;
+        let sessionTime = 0;
+        let timerInterval;
+        let currentScenario = null;
+        let sessionData = {
+            heartRateReadings: [],
+            stressLevels: [],
+            engagementScores: [],
+            sessionEvents: [],
+            startTime: null,
+            endTime: null,
+            scenario: null,
+            difficultyChanges: []
+        };
+
+        // YouTube 3D/360 VR Video IDs for different therapy scenarios
+        const scenarios = {
+            'heights': 'AJzU0QQn06E', // Example 360 height exposure video
+            'flying': 'H1HZuPe_gUo', // Example airplane 360 video
+            'social': 'dQw4w9WgXcQ', // Example social situation video
+            'nature': '3AtDnEC4zak', // Relaxing nature 360 video
+            'underwater': 'AJzU0QQn06E' // Underwater 360 video
+        };
+
+        function showScenarioSelect() {
+            const scenarioNames = {
+                'heights': 'Height Exposure Therapy',
+                'flying': 'Flight Anxiety Treatment',
+                'social': 'Social Anxiety Therapy',
+                'nature': 'Relaxation & Mindfulness',
+                'underwater': 'Aquatic Exposure Therapy'
+            };
+
+            let options = 'Select a VR Therapy Scenario:\n\n';
+            Object.keys(scenarios).forEach((key, index) => {
+                options += `${index + 1}. ${scenarioNames[key]}\n`;
+            });
+
+            const choice = prompt(options + '\nEnter the number of your choice (1-5):');
+            const scenarioKeys = Object.keys(scenarios);
+            
+            if (choice && choice >= 1 && choice <= 5) {
+                const selectedScenario = scenarioKeys[choice - 1];
+                loadYouTubeVideo(scenarios[selectedScenario]);
+                currentScenario = selectedScenario;
+                sessionData.scenario = scenarioNames[selectedScenario];
+                
+                document.querySelector('.session-info span:first-child').textContent = 
+                    `Session: ${scenarioNames[selectedScenario]}`;
+            }
+        }
+
+        function loadYouTubeVideo(videoId) {
+            const iframe = document.getElementById('youtube-player');
+            const placeholder = document.getElementById('videoPlaceholder');
+            
+            // YouTube iframe with VR/360 parameters
+            iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&controls=1&rel=0&showinfo=0&modestbranding=1&fs=1&vq=hd1080`;
+            iframe.style.display = 'block';
+            placeholder.style.display = 'none';
+        }
+
+        function startSession() {
+            if (!currentScenario) {
+                alert('Please select a therapy scenario first!');
+                showScenarioSelect();
+                return;
+            }
+
+            if (!sessionActive) {
+                sessionActive = true;
+                sessionData.startTime = new Date();
+                sessionData.sessionEvents.push({
+                    timestamp: new Date(),
+                    event: 'Session Started',
+                    details: `Scenario: ${sessionData.scenario}`
+                });
+                
+                // Reset reports button
+                document.getElementById('reportsBtn').classList.remove('enabled');
+                document.getElementById('sessionData').style.display = 'none';
+                
+                // Start timer
+                timerInterval = setInterval(updateTimer, 1000);
+                
+                // Start monitoring simulation
+                startMonitoringSimulation();
+                
+                // Update UI
+                document.querySelector('.status-indicator span').textContent = 'Session Active - Monitoring Vitals';
+                document.querySelector('.status-indicator').style.background = 'rgba(16, 185, 129, 0.2)';
+                
+                // Send play command to YouTube iframe if possible
+                const iframe = document.getElementById('youtube-player');
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                }
+            }
+        }
+
+        function pauseSession() {
+            if (sessionActive) {
+                clearInterval(timerInterval);
+                document.querySelector('.status-indicator span').textContent = 'Session Paused';
+                document.querySelector('.status-indicator').style.background = 'rgba(245, 158, 11, 0.2)';
+                
+                sessionData.sessionEvents.push({
+                    timestamp: new Date(),
+                    event: 'Session Paused',
+                    details: `Duration: ${Math.floor(sessionTime / 60)}:${(sessionTime % 60).toString().padStart(2, '0')}`
+                });
+                
+                // Send pause command to YouTube iframe
+                const iframe = document.getElementById('youtube-player');
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                }
+            }
+        }
+
+        function stopSession() {
+            sessionActive = false;
+            clearInterval(timerInterval);
+            
+            sessionData.endTime = new Date();
+            sessionData.sessionEvents.push({
+                timestamp: new Date(),
+                event: 'Session Completed',
+                details: `Total Duration: ${Math.floor(sessionTime / 60)}:${(sessionTime % 60).toString().padStart(2, '0')}`
+            });
+
+            // Enable reports button
+            document.getElementById('reportsBtn').classList.add('enabled');
+            updateSessionDataDisplay();
+            
+            sessionTime = 0;
+            document.getElementById('timer').textContent = '00:00';
+            
+            // Hide video and show placeholder
+            document.getElementById('youtube-player').style.display = 'none';
+            document.getElementById('youtube-player').src = '';
+            document.getElementById('videoPlaceholder').style.display = 'flex';
+            document.querySelector('#videoPlaceholder h3').textContent = 'VR Session Complete';
+            document.querySelector('#videoPlaceholder p').textContent = 'Session data collected - Generate AI report';
+            
+            document.querySelector('.status-indicator span').textContent = 'Session Ended - Report Available';
+            document.querySelector('.status-indicator').style.background = 'rgba(107, 114, 128, 0.2)';
+            
+            currentScenario = null;
+        }
+
+        function adjustDifficulty() {
+            if (sessionActive && currentScenario) {
+                const difficulties = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
+                const current = difficulties[Math.floor(Math.random() * difficulties.length)];
+                
+                sessionData.difficultyChanges.push({
+                    timestamp: new Date(),
+                    newDifficulty: current,
+                    sessionTime: sessionTime
+                });
+
+                sessionData.sessionEvents.push({
+                    timestamp: new Date(),
+                    event: 'Difficulty Adjusted',
+                    details: `Changed to: ${current}`
+                });
+                
+                alert(`Difficulty adjusted to: ${current}\n\nThis will modify the VR environment complexity and exposure intensity.`);
+                
+                // Update AI recommendations
+                document.querySelector('.notes-content').textContent = 
+                    `Difficulty level changed to ${current}. VR environment complexity adjusted. Monitoring patient response for adaptation patterns.`;
+            } else {
+                alert('Please start a session first to adjust difficulty.');
+            }
+        }
+
+        function updateSessionDataDisplay() {
+            document.getElementById('dataPoints').textContent = sessionData.heartRateReadings.length;
+            document.getElementById('stressPoints').textContent = sessionData.stressLevels.length;
+            document.getElementById('engagementPoints').textContent = sessionData.engagementScores.length;
+            document.getElementById('totalDuration').textContent = 
+                `${Math.floor(sessionTime / 60)}:${(sessionTime % 60).toString().padStart(2, '0')}`;
+            document.getElementById('sessionData').style.display = 'block';
+        }
+
+        function generateReport() {
+            if (!sessionData.endTime) {
+                alert('No completed session data available for report generation.');
+                return;
+            }
+
+            // Simulate AI analysis and open report in new window/page
+            const reportWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
+            const aiReport = generateAIAnalysis();
+            
+            reportWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>NeuroVR - AI Session Report</title>
+                    <style>
+                        body { 
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                            color: white;
+                            padding: 20px;
+                            margin: 0;
+                        }
+                        .header { 
+                            text-align: center;
+                            margin-bottom: 30px;
+                            border-bottom: 1px solid rgba(255,255,255,0.2);
+                            padding-bottom: 20px;
+                        }
+                        .logo { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+                        .section { 
+                            background: rgba(255,255,255,0.05);
+                            border-radius: 12px;
+                            padding: 20px;
+                            margin: 20px 0;
+                            border: 1px solid rgba(255,255,255,0.1);
+                        }
+                        .metric { 
+                            display: flex;
+                            justify-content: space-between;
+                            margin: 10px 0;
+                            padding: 8px 0;
+                            border-bottom: 1px solid rgba(255,255,255,0.1);
+                        }
+                        .score { font-weight: bold; color: #4f46e5; }
+                        .recommendation { 
+                            background: rgba(16, 185, 129, 0.1);
+                            border-left: 4px solid #10b981;
+                            padding: 15px;
+                            margin: 15px 0;
+                            border-radius: 0 8px 8px 0;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${aiReport}
+                </body>
+                </html>
+            `);
+            
+            reportWindow.document.close();
+        }
+
+        function generateAIAnalysis() {
+            const avgHeartRate = sessionData.heartRateReadings.reduce((a, b) => a + b, 0) / sessionData.heartRateReadings.length || 75;
+            const avgStress = sessionData.stressLevels.reduce((a, b) => a + b, 0) / sessionData.stressLevels.length || 3.5;
+            const avgEngagement = sessionData.engagementScores.reduce((a, b) => a + b, 0) / sessionData.engagementScores.length || 8.2;
+            
+            const duration = sessionData.endTime ? 
+                Math.round((sessionData.endTime - sessionData.startTime) / 1000 / 60) : 0;
+
+            return `
+                <div class="header">
+                    <div class="logo">🧠 NeuroVR AI Analysis Report</div>
+                    <div>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</div>
+                </div>
+                
+                <div class="section">
+                    <h3>Session Overview</h3>
+                    <div class="metric">
+                        <span>Therapy Type:</span>
+                        <span class="score">${sessionData.scenario || 'N/A'}</span>
+                    </div>
+                    <div class="metric">
+                        <span>Session Duration:</span>
+                        <span class="score">${duration} minutes</span>
+                    </div>
+                    <div class="metric">
+                        <span>Difficulty Adjustments:</span>
+                        <span class="score">${sessionData.difficultyChanges.length}</span>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Physiological Response Analysis</h3>
+                    <div class="metric">
+                        <span>Average Heart Rate:</span>
+                        <span class="score">${avgHeartRate.toFixed(1)} BPM</span>
+                    </div>
+                    <div class="metric">
+                        <span>Peak Stress Level:</span>
+                        <span class="score">${Math.max(...sessionData.stressLevels, 4.2).toFixed(1)}/10</span>
+                    </div>
+                    <div class="metric">
+                        <span>Average Engagement:</span>
+                        <span class="score">${avgEngagement.toFixed(1)}/10</span>
+                    </div>
+                    <div class="metric">
+                        <span>Adaptation Rate:</span>
+                        <span class="score">${avgStress < 4 ? 'Excellent' : avgStress < 6 ? 'Good' : 'Needs Improvement'}</span>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>AI Insights & Recommendations</h3>
+                    <div class="recommendation">
+                        <strong>Therapeutic Progress:</strong> Patient demonstrated ${avgStress < 4 ? 'excellent' : 'good'} 
+                        adaptation to VR exposure therapy. Stress levels remained within manageable range throughout the session.
+                    </div>
+                    <div class="recommendation">
+                        <strong>Next Session Recommendation:</strong> ${avgEngagement > 8 ? 
+                            'Consider advancing to the next difficulty level' : 
+                            'Maintain current difficulty with extended exposure time'}.
+                        Heart rate variability suggests good autonomic regulation.
+                    </div>
+                    <div class="recommendation">
+                        <strong>Treatment Plan:</strong> ${sessionData.difficultyChanges.length > 2 ? 
+                            'Patient responds well to progressive difficulty increases' :
+                            'Recommend gradual difficulty progression in future sessions'}.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Session Timeline</h3>
+                    ${sessionData.sessionEvents.map(event => `
+                        <div class="metric">
+                            <span>${event.event}:</span>
+                            <span>${event.details}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function emergencyStop() {
+            if (confirm('Are you sure you want to perform an emergency stop? This will immediately end the session and all monitoring.')) {
+                if (sessionActive) {
+                    sessionData.sessionEvents.push({
+                        timestamp: new Date(),
+                        event: 'Emergency Stop',
+                        details: 'Session terminated by therapist/patient safety protocol'
+                    });
+                }
+                
+                stopSession();
+                document.querySelector('#videoPlaceholder h3').textContent = 'Emergency Stop Activated';
+                document.querySelector('#videoPlaceholder p').textContent = 'Session terminated - Patient safety prioritized';
+                document.querySelector('.status-indicator span').textContent = 'Emergency Stop - Session Terminated';
+                document.querySelector('.status-indicator').style.background = 'rgba(220, 38, 38, 0.2)';
+            }
+        }
+
+        function startMonitoringSimulation() {
+            setInterval(() => {
+                if (sessionActive) {
+                    // Generate and store heart rate data
+                    const heartRate = 70 + Math.random() * 20;
+                    document.getElementById('heartRate').textContent = Math.round(heartRate);
+                    sessionData.heartRateReadings.push(heartRate);
+                    
+                    // Generate and store stress level data
+                    const stressLevel = 2 + Math.random() * 4;
+                    document.getElementById('stressLevel').textContent = stressLevel.toFixed(1);
+                    document.querySelector('.stress-level .metric-fill').style.width = (stressLevel * 10) + '%';
+                    sessionData.stressLevels.push(stressLevel);
+                    
+                    // Generate and store engagement data
+                    const engagement = 7 + Math.random() * 3;
+                    document.getElementById('engagement').textContent = engagement.toFixed(1);
+                    document.querySelector('.engagement .metric-fill').style.width = (engagement * 10) + '%';
+                    sessionData.engagementScores.push(engagement);
+                    
+                    // Update progress
+                    const progress = Math.min((sessionTime / 600) * 100, 100); // 10 minute session
+                    document.getElementById('progress').textContent = Math.round(progress);
+                    document.querySelector('.session-progress .metric-fill').style.width = progress + '%';
+                }
+            }, 2000);
+        }
+
+        function updateTimer() {
+            sessionTime++;
+            const minutes = Math.floor(sessionTime / 60);
+            const seconds = sessionTime % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Initialize monitoring simulation on page load
+        startMonitoringSimulation();
+    </script>
+</body>
+</html>
