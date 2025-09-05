@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vitals Simulator (Live Toggle)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+    h1 { text-align: center; }
+    .slider-box { margin: 30px 0; }
+    label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 1.2em; }
+    input[type=range] { width: 100%; height: 40px; }
+    span { font-size: 1.3em; font-weight: bold; margin-left: 10px; }
+    button { margin-top: 20px; padding: 12px 20px; font-size: 1.1em; border: none; border-radius: 8px; background: #28a745; color: white; cursor: pointer; width: 100%; }
+    button:hover { background: #1e7e34; }
+    .toggle { margin: 20px 0; text-align: center; }
+    .toggle input { transform: scale(1.5); margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Simulated Data</h1>
+
+  <!-- Toggle -->
+  <div class="toggle">
+    <label><strong>Live Mode</strong>
+      <input type="checkbox" id="liveToggle">
+    </label>
+  </div>
+
+  <div class="slider-box">
+    <label>Heart Rate (BPM)</label>
+    <input type="range" min="40" max="200" value="70" id="heartRate">
+    <span id="hrValue">70</span> bpm
+  </div>
+
+  <div class="slider-box">
+    <label>SpO₂ (%)</label>
+    <input type="range" min="70" max="100" value="98" id="spo2">
+    <span id="spo2Value">98</span> %
+  </div>
+
+  <div class="slider-box">
+    <label>Respiration Rate (/min)</label>
+    <input type="range" min="8" max="40" value="16" id="respRate">
+    <span id="respValue">16</span> /min
+  </div>
+
+  <button onclick="sendAll()">Submit Changes</button>
+
+  <script>
+    const liveToggle = document.getElementById("liveToggle");
+
+    function sendAll() {
+      const hr = parseInt(document.getElementById("heartRate").value);
+      const spo2 = parseInt(document.getElementById("spo2").value);
+      const resp = parseInt(document.getElementById("respRate").value);
+
+      fetch("/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ heartRate: hr, spo2: spo2, respRate: resp })
+      });
+    }
+
+    function sendUpdate(key, value) {
+      fetch("/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [key]: value })
+      });
+    }
+
+    // Sliders
+    const hr = document.getElementById("heartRate");
+    const spo2 = document.getElementById("spo2");
+    const resp = document.getElementById("respRate");
+
+    hr.addEventListener("input", e => {
+      document.getElementById("hrValue").textContent = e.target.value;
+      if (liveToggle.checked) sendUpdate("heartRate", parseInt(e.target.value));
+    });
+
+    spo2.addEventListener("input", e => {
+      document.getElementById("spo2Value").textContent = e.target.value;
+      if (liveToggle.checked) sendUpdate("spo2", parseInt(e.target.value));
+    });
+
+    resp.addEventListener("input", e => {
+      document.getElementById("respValue").textContent = e.target.value;
+      if (liveToggle.checked) sendUpdate("respRate", parseInt(e.target.value));
+    });
+  </script>
+</body>
+</html>

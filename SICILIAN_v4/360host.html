@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360° VR Video Experience</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .player-container {
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            position: relative;
+            background-color: #000;
+        }
+        
+        #vr-video {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .video-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            max-width: 800px;
+            width: 100%;
+            backdrop-filter: blur(5px);
+        }
+        
+        .instructions h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .instructions ul {
+            list-style-position: inside;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            opacity: 0.8;
+        }
+        
+        .status {
+            margin-top: 10px;
+            font-style: italic;
+            color: #ffcc00;
+        }
+        
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .player-container {
+                height: 350px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .player-container {
+                height: 250px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            button {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <header id="header">
+            <h1>360° VR Video Experience</h1>
+            <p class="subtitle">Explore our immersive virtual reality content</p>
+        </header>
+        
+        <div class="video-info" id="videoInfo">
+            <p>Video Format: WebM | Format optimized for web streaming</p>
+            <p class="status" id="status">Initializing player...</p>
+        </div>
+        
+        <div class="player-container" id="playerContainer">
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+            </div>
+            
+            <!-- A-Frame VR Scene -->
+            <a-scene id="vr-video" embedded>
+                <!-- 360 Video Sphere -->
+                <a-videosphere rotation="0 180 0" src="#video360"></a-videosphere>
+                
+                <!-- Camera -->
+                <a-camera>
+                    <a-cursor></a-cursor>
+                </a-camera>
+            </a-scene>
+        </div>
+        
+        <div class="controls" id="controls">
+            <button id="playBtn">Play</button>
+            <button id="pauseBtn">Pause</button>
+            <button id="enterVR">Enter VR</button>
+            <button id="resetView">Reset View</button>
+            <button id="muteBtn">Toggle Mute</button>
+            <button id="reloadBtn">Reload Video</button>
+        </div>
+        
+        <div class="instructions" id="instructions">
+            <h2>How to Experience the 360° Video</h2>
+            <ul>
+                <li><strong>Desktop:</strong> Click and drag to look around</li>
+                <li><strong>Mobile:</strong> Move your device to look around (gyroscope)</li>
+                <li><strong>VR Headsets:</strong> Click "Enter VR" and use your headset controls</li>
+                <li><strong>Cardboard viewers:</strong> Tap the VR icon and place your phone in a viewer</li>
+                <li><strong>Note:</strong> Some browsers may require interaction before video playback</li>
+                <li><strong>Local hosting:</strong> Run with <code>http://localhost</code> (not file://)</li>
+            </ul>
+        </div>
+        
+        <div class="footer" id="footer">
+            <p>Powered by A-Frame & WebVR | Your Website Name © 2025</p>
+        </div>
+    </div>
+
+    <!-- Video element -->
+    <video id="video360" loop crossorigin="anonymous" style="display: none;">
+        <source id="videoSource" src="heights1.webm" type="video/webm">
+    </video>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusEl = document.getElementById('status');
+            const loader = document.getElementById('loader');
+            const video = document.getElementById('video360');
+            const source = document.getElementById('videoSource');
+            const container = document.getElementById('container');
+            const header = document.getElementById('header');
+            const videoInfo = document.getElementById('videoInfo');
+            const playerContainer = document.getElementById('playerContainer');
+            const controls = document.getElementById('controls');
+            const instructions = document.getElementById('instructions');
+            const footer = document.getElementById('footer');
+            
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const enterVR = document.getElementById('enterVR');
+            const resetView = document.getElementById('resetView');
+            const muteBtn = document.getElementById('muteBtn');
+            const reloadBtn = document.getElementById('reloadBtn');
+            
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
+            video.muted = true; 
+
+            // Read ?src=... from query to select the video dynamically
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const src = params.get('src');
+                const minimal = params.get('minimal');
+                if (src) {
+                    source.setAttribute('src', src);
+                    video.load();
+                }
+                if (minimal) {
+                    if (header) header.style.display = 'none';
+                    if (videoInfo) videoInfo.style.display = 'none';
+                    if (controls) controls.style.display = 'none';
+                    if (instructions) instructions.style.display = 'none';
+                    if (footer) footer.style.display = 'none';
+                    if (container) {
+                        container.style.padding = '0';
+                    }
+                    if (playerContainer) {
+                        playerContainer.style.maxWidth = 'unset';
+                        playerContainer.style.height = '100vh';
+                        playerContainer.style.margin = '0';
+                        playerContainer.style.borderRadius = '0';
+                    }
+                }
+            } catch (e) {}
+            
+            function updateStatus(message) {
+                statusEl.textContent = message;
+                console.log('Status:', message);
+            }
+            
+            function hideLoader() {
+                loader.style.display = 'none';
+            }
+            
+            function showLoader() {
+                loader.style.display = 'flex';
+            }
+            
+            playBtn.addEventListener('click', function() {
+                showLoader();
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(function() {
+                        updateStatus('Video playing');
+                        hideLoader();
+                    }).catch(function(error) {
+                        updateStatus('Playback failed: ' + error.message);
+                        hideLoader();
+                    });
+                }
+            });
+            
+            pauseBtn.addEventListener('click', function() {
+                video.pause();
+                updateStatus('Video paused');
+            });
+            
+            let isMuted = true;
+            muteBtn.addEventListener('click', function() {
+                isMuted = !isMuted;
+                video.muted = isMuted;
+                muteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
+                updateStatus(isMuted ? 'Video muted' : 'Video unmuted');
+            });
+            
+            enterVR.addEventListener('click', function() {
+                const scene = document.querySelector('a-scene');
+                scene.enterVR();
+                updateStatus('Entered VR mode');
+            });
+            
+            resetView.addEventListener('click', function() {
+                const camera = document.querySelector('a-camera');
+                if (camera) {
+                    camera.setAttribute('rotation', {x: 0, y: 0, z: 0});
+                    updateStatus('View reset');
+                }
+            });
+            
+            reloadBtn.addEventListener('click', function() {
+                showLoader();
+                updateStatus('Reloading video...');
+                video.load();
+                setTimeout(function() {
+                    video.play().then(function() {
+                        updateStatus('Video reloaded and playing');
+                        hideLoader();
+                    }).catch(function(error) {
+                        updateStatus('Failed to reload: ' + error.message);
+                        hideLoader();
+                    });
+                }, 500);
+            });
+            
+            video.addEventListener('loadeddata', function() {
+                updateStatus('Video loaded');
+                hideLoader();
+            });
+            
+            video.addEventListener('canplay', function() {
+                updateStatus('Video can play');
+                hideLoader();
+            });
+            
+            video.addEventListener('waiting', function() {
+                updateStatus('Buffering video...');
+                showLoader();
+            });
+            
+            video.addEventListener('playing', function() {
+                updateStatus('Video playing');
+                hideLoader();
+            });
+            
+            video.addEventListener('error', function() {
+                updateStatus('Error loading video. Check console for details.');
+                hideLoader();
+            });
+            
+            document.body.addEventListener('click', function initPlay() {
+                video.play().then(() => {
+                    updateStatus('Video playing successfully');
+                    hideLoader();
+                }).catch(() => {
+                    updateStatus('Click play button to start video');
+                    hideLoader();
+                });
+                document.body.removeEventListener('click', initPlay);
+            }, { once: true });
+            
+            updateStatus('Ready - click anywhere to start');
+
+            // Message API: control from parent (play/pause/stop)
+            window.addEventListener('message', function(event) {
+                try {
+                    const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+                    if (!data || data.type !== 'control') return;
+                    if (data.action === 'play') {
+                        video.play().catch(() => {});
+                    } else if (data.action === 'pause') {
+                        video.pause();
+                    } else if (data.action === 'stop') {
+                        video.pause();
+                        video.currentTime = 0; // Reset to beginning
+                        updateStatus('Video stopped');
+                    }
+                } catch (e) {}
+            });
+        });
+    </script>
+</body>
+</html>

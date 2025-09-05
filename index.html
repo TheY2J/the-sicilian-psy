@@ -1,0 +1,483 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroVR - Virtual Reality Therapy</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="logo">
+      <div class="logo-icon"></div>NeuroVR
+    </div>
+    <div class="nav-links">
+      <div class="nav-link active" data-target="dashboard">Dashboard</div>
+      <div class="nav-link" data-target="profile">Profile</div>
+      <div class="nav-link" data-target="reports">Reports</div>
+      <div class="nav-link" data-target="analytics">Analytics</div>
+      <div class="nav-link" onclick="window.location.href='therapist-view.html'">🧑‍⚕️ Therapist</div>
+    </div>
+
+    <div class="user-profile" id="userProfile">
+      <div class="user-info">
+        <div class="user-name">John Doe</div>
+        <div class="user-status">Premium Member</div>
+      </div>
+      <div class="user-avatar">JD</div>
+
+      <!-- Dropdown -->
+      <div class="profile-dropdown" id="profileDropdown">
+        <div class="dropdown-item" data-target="profile">👤 View Profile</div>
+        <div class="dropdown-item" data-target="reports">📊 My Reports</div>
+        <div class="dropdown-item" onclick="window.location.href='therapist-view.html'">🧑‍⚕️ Therapist Dashboard</div>
+        <div class="dropdown-item" id="themeToggle">🌓 Toggle Theme</div>
+        <div class="dropdown-item" id="logoutBtn">🚪 Logout</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="notification" id="toast">✔ Action completed.</div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Dashboard Content -->
+    <div id="dashboard" class="main-content active">
+      <div class="dashboard-grid">
+        <div class="content-area">
+          <div class="card welcome-section">
+            <div class="welcome-content">
+              <h2>Welcome back, John!</h2>
+              <p>Your journey to overcoming anxiety and phobias continues. Track your progress, start new therapy
+                sessions, and take control of your mental wellness with our immersive VR therapy platform.</p>
+              <div style="margin-top: 20px;">
+                <button class="action-btn action-primary" onclick="window.location.href='therapist-view.html'" style="margin-right: 10px;">
+                  🧑‍⚕️ Access Therapist Dashboard
+                </button>
+                <span style="color: #9aa; font-size: 14px;">For healthcare professionals and therapists</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card therapy-sessions">
+            <div class="sessions-header">
+              <h3 class="sessions-title">Available Therapy Sessions</h3>
+              <button class="dropdown-btn" id="dropdownBtn1">
+                <span class="dropdown-icon">▼</span>
+                <span class="dropdown-text">Expand</span>
+                <span class="session-count">(3 sessions)</span>
+              </button>
+            </div>
+
+            <div class="sessions-grid collapsed" id="sessionsGrid1">
+              <div class="session-card heights" data-session="heights" data-video="rNVpFXuAXIA">
+                <div class="session-icon">🏔</div>
+                <div class="session-title">Fear of Heights</div>
+                <div class="session-description">Gradual exposure to height scenarios in a controlled VR environment.
+                  Build confidence step by step.</div>
+                <div class="session-stats">
+                  <div class="session-duration">15–30 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Level 1-4</div>
+                </div>
+              </div>
+
+              <div class="session-card ptsd" data-session="ptsd" data-video="ptsd_video">
+                <div class="session-icon">🪖</div>
+                <div class="session-title">PTSD War Survivors</div>
+                <div class="session-description">Specialized therapy for war veterans and survivors. Controlled exposure to
+                  help process trauma and build resilience.</div>
+                <div class="session-stats">
+                  <div class="session-duration">25–45 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Level 1</div>
+                </div>
+              </div>
+
+              <div class="session-card darkness" data-session="darkness" data-video="3V15IB3pc94">
+                <div class="session-icon">🌙</div>
+                <div class="session-title">Fear of Darkness</div>
+                <div class="session-description">Explore dark environments gradually. Build comfort and reduce anxiety in
+                  low-light situations.</div>
+                <div class="session-stats">
+                  <div class="session-duration">10–25 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Level 1-4</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card therapy-sessions">
+            <div class="sessions-header">
+              <h3 class="sessions-title">Therapeutic Exercises</h3>
+              <button class="dropdown-btn" id="dropdownBtn2">
+                <span class="dropdown-icon">▼</span>
+                <span class="dropdown-text">Expand</span>
+                <span class="session-count">(12 exercises)</span>
+              </button>
+            </div>
+
+            <div class="sessions-grid collapsed" id="sessionsGrid2">
+              <!-- Fear of Heights Exercises -->
+              <div class="session-card breathing" data-session="breathing" data-exercise="heights-breathing">
+                <div class="session-icon">🌬️</div>
+                <div class="session-title">Controlled Breathing</div>
+                <div class="session-description">Follow breathing patterns to calm your nervous system when facing heights. Manage acute anxiety with guided breathing exercises.</div>
+                <div class="session-stats">
+                  <div class="session-duration">5–10 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Heights</div>
+                </div>
+              </div>
+
+              <div class="session-card grounding" data-session="grounding" data-exercise="heights-grounding">
+                <div class="session-icon">👣</div>
+                <div class="session-title">Grounded Stance</div>
+                <div class="session-description">Practice stable positioning to counteract feelings of instability in high places. Build confidence through proper stance.</div>
+                <div class="session-stats">
+                  <div class="session-duration">5–15 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Heights</div>
+                </div>
+              </div>
+
+              <div class="session-card cognitive" data-session="cognitive" data-exercise="heights-reframing">
+                <div class="session-icon">🧠</div>
+                <div class="session-title">Cognitive Reframing</div>
+                <div class="session-description">Learn to reframe anxious thoughts about heights into more balanced perspectives. Challenge fearful thinking patterns.</div>
+                <div class="session-stats">
+                  <div class="session-duration">10–20 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Heights</div>
+                </div>
+              </div>
+
+              <!-- Fear of Darkness Exercises -->
+              <div class="session-card sensory" data-session="sensory" data-exercise="darkness-sensory">
+                <div class="session-icon">👂</div>
+                <div class="session-title">Sensory Amplification</div>
+                <div class="session-description">Redirect attention from absence of light to other sensory experiences. Shift focus away from darkness fears.</div>
+                <div class="session-stats">
+                  <div class="session-duration">10–15 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Darkness</div>
+                </div>
+              </div>
+
+              <div class="session-card vision" data-session="vision" data-exercise="darkness-vision">
+                <div class="session-icon">👁️</div>
+                <div class="session-title">Peripheral Vision</div>
+                <div class="session-description">Expand your peripheral vision to counteract tunnel vision in darkness. Reduce hyper-vigilance and anxiety.</div>
+                <div class="session-stats">
+                  <div class="session-duration">5–10 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Darkness</div>
+                </div>
+              </div>
+
+              <div class="session-card light" data-session="light" data-exercise="darkness-light">
+                <div class="session-icon">💡</div>
+                <div class="session-title">Light Control</div>
+                <div class="session-description">Gradually increase tolerance to darkness while maintaining control. Build empowerment in dark environments.</div>
+                <div class="session-stats">
+                  <div class="session-duration">10–20 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Darkness</div>
+                </div>
+              </div>
+
+              <!-- PTSD Exercises -->
+              <div class="session-card anchoring" data-session="anchoring" data-exercise="ptsd-anchoring">
+                <div class="session-icon">⚓</div>
+                <div class="session-title">Present-Moment Anchoring</div>
+                <div class="session-description">Re-engage with present reality when experiencing PTSD symptoms. Prevent flashbacks and dissociation.</div>
+                <div class="session-stats">
+                  <div class="session-duration">5–15 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">PTSD</div>
+                </div>
+              </div>
+
+              <div class="session-card safe" data-session="safe" data-exercise="ptsd-safe">
+                <div class="session-icon">🏠</div>
+                <div class="session-title">Safe Space Visualization</div>
+                <div class="session-description">Develop and access a mental sanctuary when triggers become overwhelming. Create mental escape during distress.</div>
+                <div class="session-stats">
+                  <div class="session-duration">10–25 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">PTSD</div>
+                </div>
+              </div>
+
+              <div class="session-card narrative" data-session="narrative" data-exercise="ptsd-narrative">
+                <div class="session-icon">📖</div>
+                <div class="session-title">Narrative Coherence</div>
+                <div class="session-description">Reframe traumatic experiences as completed events rather than ongoing threats. Process memories safely.</div>
+                <div class="session-stats">
+                  <div class="session-duration">15–30 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">PTSD</div>
+                </div>
+              </div>
+
+              <!-- Common Exercises -->
+              <div class="session-card diaphragmatic" data-session="diaphragmatic" data-exercise="common-diaphragmatic">
+                <div class="session-icon">🫁</div>
+                <div class="session-title">Diaphragmatic Breathing</div>
+                <div class="session-description">Deep breathing technique to lower baseline anxiety and manage stress. Regulate your nervous system effectively.</div>
+                <div class="session-stats">
+                  <div class="session-duration">5–15 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Common</div>
+                </div>
+              </div>
+
+              <div class="session-card progressive" data-session="progressive" data-exercise="common-pmr">
+                <div class="session-icon">💪</div>
+                <div class="session-title">Progressive Muscle Relaxation</div>
+                <div class="session-description">Systematically tense and release muscle groups to reduce physical anxiety. Release tension throughout your body.</div>
+                <div class="session-stats">
+                  <div class="session-duration">15–25 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Common</div>
+                </div>
+              </div>
+
+              <div class="session-card observation" data-session="observation" data-exercise="common-observation">
+                <div class="session-icon">🔍</div>
+                <div class="session-title">Mindful Observation</div>
+                <div class="session-description">Divert attention from anxious thoughts to external, neutral stimuli. Ground yourself in the present moment.</div>
+                <div class="session-stats">
+                  <div class="session-duration">5–15 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Common</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card therapy-sessions">
+            <div class="sessions-header">
+              <h3 class="sessions-title">Mood Enhancers</h3>
+              <button class="dropdown-btn" id="dropdownBtn3">
+                <span class="dropdown-icon">▼</span>
+                <span class="dropdown-text">Expand</span>
+                <span class="session-count">(4 sessions)</span>
+              </button>
+            </div>
+
+            <div class="sessions-grid collapsed" id="sessionsGrid3">
+              <div class="session-card nature" data-video="nature">
+                <div class="session-icon">🌿</div>
+                <div class="session-title">Nature Immersion</div>
+                <div class="session-description">Peaceful natural environments to boost mood and reduce stress. 1-minute calming nature video.</div>
+                <div class="session-stats">
+                  <div class="session-duration">1 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Mood Enhancer</div>
+                </div>
+              </div>
+
+              <div class="session-card music" data-video="music">
+                <div class="session-icon">🎵</div>
+                <div class="session-title">Therapeutic Music</div>
+                <div class="session-description">Immersive musical experiences designed for emotional healing. 1-minute therapeutic music video.</div>
+                <div class="session-stats">
+                  <div class="session-duration">1 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Mood Enhancer</div>
+                </div>
+              </div>
+
+              <div class="session-card art" data-video="art">
+                <div class="session-icon">🎨</div>
+                <div class="session-title">Art Therapy</div>
+                <div class="session-description">Creative expression through beautiful art and visual experiences. 1-minute art therapy video.</div>
+                <div class="session-stats">
+                  <div class="session-duration">1 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Mood Enhancer</div>
+                </div>
+              </div>
+
+              <div class="session-card social" data-video="social">
+                <div class="session-icon">👥</div>
+                <div class="session-title">Social Connection</div>
+                <div class="session-description">Virtual social spaces for community building and support. 1-minute social connection video.</div>
+                <div class="session-stats">
+                  <div class="session-duration">1 min</div>
+                  <div class="session-difficulty difficulty-level-1-only">Mood Enhancer</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card recent-sessions">
+            <div class="sessions-header">
+              <h3>Recent Session History</h3>
+              <button class="action-btn" data-target="reports">📊 View All Reports</button>
+            </div>
+
+            <div class="session-history-item">
+              <div class="session-history-info">
+                <div class="session-history-title">Fear of Heights — Session 3</div>
+                <div class="session-history-date">Yesterday, 2:30 PM</div>
+              </div>
+              <div class="session-success-rate">85% Success</div>
+            </div>
+            <div class="session-history-item">
+              <div class="session-history-info">
+                <div class="session-history-title">Fear of Flying — Session 2</div>
+                <div class="session-history-date">3 days ago, 4:15 PM</div>
+              </div>
+              <div class="session-success-rate"
+                style="background:rgba(245,158,11,.18);color:#f59e0b;border-color:rgba(245,158,11,.28)">
+                72% Success</div>
+            </div>
+            <div class="session-history-item">
+              <div class="session-history-info">
+                <div class="session-history-title">Fear of Darkness — Session 1</div>
+                <div class="session-history-date">1 week ago, 6:45 PM</div>
+              </div>
+              <div class="session-success-rate"
+                style="background:rgba(239,68,68,.18);color:#ef4444;border-color:rgba(239,68,68,.28)">
+                68% Success</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <div class="card">
+            <div class="stats-header">📈 Progress Overview</div>
+            <div class="stat-item"><span class="stat-label">Completed Sessions</span><span
+                class="stat-value">12</span>
+            </div>
+            <div class="stat-item"><span class="stat-label">Success Rate</span><span class="stat-value">78%</span></div>
+            <div class="stat-item"><span class="stat-label">Current Streak</span><span class="stat-value">5 days</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="stats-header">🎯 Therapy Goal</div>
+            <div class="ring-wrap">
+              <div class="progress-ring" id="goalRing" style="--p:70">
+                <div class="progress-text" id="goalText">70%</div>
+              </div>
+              <div>
+                <div class="stat-label">Exposure Plan Completion</div>
+                <div class="stat-value">Level 4 of 6</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="stats-header">⚡ Quick Actions</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button class="action-btn" id="startBreathing">🧘 Start 4-7-8 Breathing</button>
+              <button class="action-btn action-primary" id="newSession">➕ New Session</button>
+              <button class="action-btn" id="exportReport">📤 Export Report</button>
+              <button class="action-btn" id="therapistView" onclick="window.location.href='therapist-view.html'">🧑‍⚕️ Therapist View</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Profile Section -->
+    <div id="profile" class="main-content">
+      <div class="card" style="margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div class="user-avatar" style="width:64px;height:64px;font-size:22px">JD</div>
+          <div>
+            <div style="font-size:20px;font-weight:800">John Doe</div>
+            <div style="color:#9aa;margin-top:4px">Member since Jan 2025</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reports-grid">
+        <div class="card">
+          <div class="report-title">Personal Info</div>
+          <div style="margin-top:12px;display:grid;gap:10px">
+            <label class="stat-label">Full Name</label>
+            <input class="action-btn" style="padding:10px;cursor:text" value="John Doe" />
+            <label class="stat-label">Email</label>
+            <input class="action-btn" style="padding:10px;cursor:text" value="john.doe@email.com" />
+            <label class="stat-label">Phone</label>
+            <input class="action-btn" style="padding:10px;cursor:text" value="+91 9876543210" />
+            <button class="start-session-btn" id="saveProfile">Save Changes</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="report-title">Preferences</div>
+          <div style="margin-top:12px;display:grid;gap:10px">
+            <label class="stat-label">Theme</label>
+            <select class="action-btn" id="themeSelect" style="cursor:pointer">
+              <option selected>Dark</option>
+              <option>Light</option>
+            </select>
+            <label class="stat-label">Notifications</label>
+            <select class="action-btn" id="notifSelect" style="cursor:pointer">
+              <option selected>Enabled</option>
+              <option>Disabled</option>
+            </select>
+            <button class="start-session-btn" id="savePrefs">Update Preferences</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Section -->
+    <div id="reports" class="main-content">
+      <div class="card">
+        <h3 style="font-size:20px;font-weight:800">My Reports</h3>
+        <div class="reports-grid">
+          <div class="report-card">
+            <div class="report-title">Weekly Progress</div>
+            <div class="report-date">Aug 20, 2025</div>
+            <div class="report-summary">You completed 3 sessions this week with an average success rate of 80%.</div>
+          </div>
+          <div class="report-card">
+            <div class="report-title">Monthly Overview</div>
+            <div class="report-date">Aug 2025</div>
+            <div class="report-summary">A total of 12 sessions completed with consistent improvement noted.</div>
+          </div>
+          <div class="report-card">
+            <div class="report-title">Trigger Analysis</div>
+            <div class="report-date">Latest</div>
+            <div class="report-summary">Peak triggers were heights > glass bridges; breathing reduced HR by ~18%.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Section -->
+    <div id="analytics" class="main-content">
+      <div class="card">
+        <h3 style="font-size:20px;font-weight:800">Analytics</h3>
+        <div class="analytics-grid">
+          <div class="analytics-card">
+            <div style="font-weight:800">Session Success Rates</div>
+            <div class="chart-placeholder">[Chart Placeholder]</div>
+          </div>
+          <div class="analytics-card">
+            <div style="font-weight:800">Time Spent</div>
+            <div class="chart-placeholder">[Chart Placeholder]</div>
+          </div>
+          <div class="analytics-card">
+            <div style="font-weight:800">Heart Rate Trend</div>
+            <div class="chart-placeholder">[Chart Placeholder]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Modal -->
+  <div class="modal" id="sessionModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Start Session</div>
+        <button class="close-btn" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        You're about to begin a guided VR exposure. Ensure your headset is connected and your play area is clear.
+      </div>
+      <button class="start-session-btn" id="startSessionBtn">Start Now</button>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+
+</html>

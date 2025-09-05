@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroVR - Therapy Session</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .control-btn.mood-enhancer {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #10b981;
+      color: white;
+    }
+    
+    .control-btn.mood-enhancer:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: translateY(-1px);
+    }
+    
+    .mood-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .mood-option {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .mood-option:hover {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: #10b981;
+      transform: translateY(-2px);
+    }
+    
+    .mood-icon {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .mood-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    
+    .mood-description {
+      font-size: 0.9rem;
+      color: #9aa;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="therapy-container">
+    <div class="video-section">
+      <div class="therapy-header">
+        <button class="back-to-dashboard" onclick="window.location.href='index.html'">← Dashboard</button>
+        <div class="therapy-logo">NeuroVR Therapy</div>
+        <div class="session-info">
+          <span id="session-type">Height Exposure Therapy</span>
+          <span>Duration: <span id="timer">00:00</span></span>
+          <span>Patient: John D.</span>
+        </div>
+      </div>
+
+      <div class="video-container">
+        <div class="video-placeholder" id="videoPlaceholder">
+          <div class="vr-icon">🥽</div>
+          <h3>VR Session Ready</h3>
+          <p>Select a therapy scenario to begin</p>
+        </div>
+        <iframe id="youtube-player" style="display: none;" allow="autoplay; encrypted-media" allowfullscreen playsinline></iframe>
+      </div>
+
+      <div class="therapy-controls">
+        <button class="control-btn primary" id="startResumeBtn" onclick="startSession()">
+          <span>▶</span> Start Session
+        </button>
+        <button class="control-btn" onclick="pauseSession()">
+          <span>⏸</span> Pause
+        </button>
+        <button class="control-btn" onclick="showScenarioSelect()">
+          <span>🎬</span> Select Scenario
+        </button>
+        <button class="control-btn" onclick="adjustDifficulty()">
+          <span>⚙</span> Adjust Difficulty
+        </button>
+        <button class="control-btn mood-enhancer" onclick="showMoodEnhancerSelect()">
+          <span>🌿</span> Mood Enhancer
+        </button>
+        <button class="control-btn danger" onclick="stopSession()">
+          <span>⏹</span> Stop Session
+        </button>
+      </div>
+    </div>
+
+    <div class="monitoring-panel">
+      <div class="panel-header">Real-time Monitoring</div>
+
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        <span>Session Active - Monitoring Vitals</span>
+      </div>
+
+      <div class="metric-card heart-rate">
+        <div class="metric-title">Heart Rate</div>
+        <div class="metric-value"><span id="heartRate">72</span> BPM</div>
+        <div class="metric-bar">
+          <div class="metric-fill" style="width: 60%"></div>
+        </div>
+      </div>
+
+      <div class="metric-card respiration-rate">
+        <div class="metric-title">Respiration Rate</div>
+        <div class="metric-value"><span id="respirationRate">16</span> Breaths/min</div>
+        <div class="metric-bar">
+          <div class="metric-fill" style="width: 50%"></div>
+        </div>
+      </div>
+
+      <div class="metric-card spo2">
+        <div class="metric-title">SpO2</div>
+        <div class="metric-value"><span id="spo2">98.0</span>%</div>
+        <div class="metric-bar">
+          <div class="metric-fill" style="width: 98%"></div>
+        </div>
+      </div>
+
+      <div class="metric-card session-progress">
+        <div class="metric-title">Session Progress</div>
+        <div class="metric-value"><span id="progress">25</span>%</div>
+        <div class="metric-bar">
+          <div class="metric-fill" style="width: 25%"></div>
+        </div>
+      </div>
+
+      <div class="therapy-notes">
+        <div class="notes-title">AI Recommendations</div>
+        <div class="notes-content">
+          Patient showing good adaptation to current exposure level. Heart rate stable. Consider increasing
+          difficulty in 2 minutes if stress levels remain low.
+        </div>
+      </div>
+
+      <div class="reports-section">
+        <button class="reports-btn" id="reportsBtn" onclick="generateReport()">
+          📊 Generate AI Session Report
+        </button>
+        <div class="session-data" id="sessionData">
+          <strong>Session Data Collected:</strong><br>
+          • Heart Rate: <span id="dataPoints">0</span> data points<br>
+          • Stress Measurements: <span id="stressPoints">0</span> readings<br>
+          • Engagement Tracking: <span id="engagementPoints">0</span> samples<br>
+          • Session Duration: <span id="totalDuration">0:00</span>
+        </div>
+      </div>
+
+      <button class="emergency-btn" onclick="emergencyStop()">
+        🚨 Emergency Stop
+      </button>
+    </div>
+  </div>
+
+  <!-- Scenario Selection Modal -->
+  <div class="modal scenario-modal" id="scenarioModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Select Therapy Scenario</div>
+        <button class="close-btn" id="closeScenarioModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Choose a VR therapy scenario to begin your session:</p>
+        <div class="scenario-options">
+          <div class="scenario-option" data-scenario="heights">
+            <div class="scenario-icon">🏔️</div>
+            <div class="scenario-info">
+              <h3>Height Exposure Therapy</h3>
+              <p>Gradual exposure to heights in controlled environments</p>
+            </div>
+          </div>
+          <div class="scenario-option" data-scenario="darkness">
+            <div class="scenario-icon">🌙</div>
+            <div class="scenario-info">
+              <h3>Darkness Exposure Therapy</h3>
+              <p>Overcome fear of darkness through immersive experiences</p>
+            </div>
+          </div>
+          <div class="scenario-option" data-scenario="ptsd">
+            <div class="scenario-icon">🛡️</div>
+            <div class="scenario-info">
+              <h3>War Soldiers PTSD Therapy</h3>
+              <p>Specialized therapy for military personnel and veterans</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Difficulty Selection Modal -->
+  <div class="modal difficulty-modal" id="difficultyModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Adjust Difficulty Level</div>
+        <button class="close-btn" id="closeDifficultyModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Select the intensity level for your therapy session:</p>
+        <div class="difficulty-options">
+          <div class="difficulty-option" data-level="1">
+            <div class="difficulty-icon">🟢</div>
+            <div class="difficulty-info">
+              <h3>Level 1 - Introduction</h3>
+              <p>Gentle exposure, perfect for beginners</p>
+            </div>
+          </div>
+          <div class="difficulty-option" data-level="2">
+            <div class="difficulty-icon">🟡</div>
+            <div class="difficulty-info">
+              <h3>Level 2 - Moderate</h3>
+              <p>Balanced intensity for gradual progress</p>
+            </div>
+          </div>
+          <div class="difficulty-option" data-level="3">
+            <div class="difficulty-icon">🟠</div>
+            <div class="difficulty-info">
+              <h3>Level 3 - Intense</h3>
+              <p>Challenging scenarios for experienced users</p>
+            </div>
+          </div>
+          <div class="difficulty-option" data-level="4">
+            <div class="difficulty-icon">🔴</div>
+            <div class="difficulty-info">
+              <h3>Level 4 - Extreme</h3>
+              <p>Maximum intensity for advanced therapy</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div class="modal feedback-modal" id="feedbackModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Session Feedback</div>
+        <button class="close-btn" id="closeFeedbackModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Your feedback is valuable. Please rate your current state of mind and provide any comments about the session.</p>
+        <form id="feedbackForm">
+          <label class="stat-label" style="display:block; margin-top:16px; margin-bottom: 8px;">On a scale of 1 (Anxious) to 10 (Calm), how are you feeling now?</label>
+          <div class="mood-scale" id="moodScale"></div>
+
+          <label class="stat-label" style="display:block; margin-top:16px; margin-bottom: 8px;">Which word best describes your feeling right now?</label>
+          <div class="option-buttons">
+            <label class="option-btn">
+              <input type="radio" name="feeling" value="Anxious" checked>
+              <span>Anxious</span>
+            </label>
+            <label class="option-btn">
+              <input type="radio" name="feeling" value="Calm">
+              <span>Calm</span>
+            </label>
+            <label class="option-btn">
+              <input type="radio" name="feeling" value="Panic">
+              <span>Panic</span>
+            </label>
+            <label class="option-btn">
+              <input type="radio" name="feeling" value="Relaxed">
+              <span>Relaxed</span>
+            </label>
+          </div>
+
+          <label class="stat-label" style="display:block; margin-top:16px; margin-bottom: 8px;">Was the environment immersive enough for you?</label>
+          <div class="option-buttons">
+            <label class="option-btn">
+              <input type="radio" name="immersive" value="Yes" checked>
+              <span>Yes</span>
+            </label>
+            <label class="option-btn">
+              <input type="radio" name="immersive" value="No">
+              <span>No</span>
+            </label>
+          </div>
+
+          <label class="stat-label" style="display:block; margin-top:16px; margin-bottom: 8px;">Did you feel overwhelmed at any specific moment? (briefly describe)</label>
+          <textarea id="overwhelmedText" name="overwhelmed" class="feedback-textarea" placeholder="If yes, where/when and what triggered it?"></textarea>
+
+          <label class="stat-label" style="display:block; margin-top:16px; margin-bottom: 8px;">Any additional comments?</label>
+          <textarea id="feedbackComments" class="feedback-textarea" placeholder="e.g., 'The city view was challenging but helpful.'"></textarea>
+
+          <button type="submit" class="start-session-btn" style="margin-top:20px;">Submit Feedback</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mood Enhancer Selection Modal -->
+  <div class="modal mood-modal" id="moodModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Select Mood Enhancer</div>
+        <button class="close-btn" id="closeMoodModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Choose a calming mood enhancer video to help relax and reduce stress:</p>
+        <div class="mood-options">
+          <div class="mood-option" onclick="selectMoodEnhancer('relaxing-video1.mp4')">
+            <div class="mood-icon">🌿</div>
+            <div class="mood-title">Nature Immersion</div>
+            <div class="mood-description">Peaceful natural environments</div>
+          </div>
+          <div class="mood-option" onclick="selectMoodEnhancer('relaxing-video2.mp4')">
+            <div class="mood-icon">🎵</div>
+            <div class="mood-title">Therapeutic Music</div>
+            <div class="mood-description">Calming musical experiences</div>
+          </div>
+          <div class="mood-option" onclick="selectMoodEnhancer('relaxing-video3.mp4')">
+            <div class="mood-icon">🎨</div>
+            <div class="mood-title">Art Therapy</div>
+            <div class="mood-description">Creative visual experiences</div>
+          </div>
+          <div class="mood-option" onclick="selectMoodEnhancer('relaxing-video4.mp4')">
+            <div class="mood-icon">👥</div>
+            <div class="mood-title">Social Connection</div>
+            <div class="mood-description">Community and connection</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="video-session.js"></script>
+</body>
+
+</html>

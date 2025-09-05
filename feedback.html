@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroVR - Session Feedback</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="navbar">
+    <div class="logo">
+      <div class="logo-icon"></div>NeuroVR
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card" style="max-width: 600px; margin: 40px auto;">
+      <div class="modal-header">
+        <div class="modal-title">Session Feedback</div>
+      </div>
+      <div class="modal-body">
+        <p>Your feedback is valuable. Please rate your current state of mind and provide any comments about the
+          session.</p>
+        <form id="feedbackForm">
+          <label class="stat-label" style="display:block; margin-top:16px; margin-bottom: 8px;">On a scale of 1 (Anxious)
+            to
+            10 (Calm), how are you feeling now?</label>
+          <div class="mood-scale" id="moodScale">
+            <!-- Numbers 1 to 10 for the mood scale -->
+          </div>
+
+          <!-- Additional feedback options -->
+          <label class="stat-label" style="display:block; margin-top:16px; margin-bottom: 8px;">Which word best describes
+            your feeling right now?</label>
+          <div class="option-buttons">
+            <label class="option-btn">
+              <input type="radio" name="feeling" value="Anxious" checked>
+              <span>Anxious</span>
+            </label>
+            <label class="option-btn">
+              <input type="radio" name="feeling" value="Calm">
+              <span>Calm</span>
+            </label>
+            <label class="option-btn">
+              <input type="radio" name="feeling" value="Panic">
+              <span>Panic</span>
+            </label>
+            <label class="option-btn">
+              <input type="radio" name="feeling" value="Relaxed">
+              <span>Relaxed</span>
+            </label>
+          </div>
+
+          <label class="stat-label" style="display:block; margin-top:16px; margin-bottom: 8px;">Was the environment
+            immersive enough for you?</label>
+          <div class="option-buttons">
+            <label class="option-btn">
+              <input type="radio" name="immersive" value="Yes" checked>
+              <span>Yes</span>
+            </label>
+            <label class="option-btn">
+              <input type="radio" name="immersive" value="No">
+              <span>No</span>
+            </label>
+          </div>
+
+          <label class="stat-label" style="display:block; margin-top:16px; margin-bottom: 8px;">Did you feel overwhelmed
+            at any specific moment? (briefly describe)</label>
+          <textarea id="overwhelmedText" name="overwhelmed" class="feedback-textarea"
+            placeholder="If yes, where/when and what triggered it?"></textarea>
+
+          <label class="stat-label" style="display:block; margin-top:16px; margin-bottom: 8px;">Any additional
+            comments?</label>
+          <textarea id="feedbackComments" class="feedback-textarea"
+            placeholder="e.g., 'The city view was challenging but helpful.'"></textarea>
+
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="submit" class="start-session-btn">Submit Feedback</button>
+            <button type="button" class="action-btn" onclick="window.location.href='index.html'">Skip Feedback</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="feedback.js"></script>
+  <script>
+    // Apply saved theme so styles match navigation from other pages
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+      } else {
+        document.body.classList.remove('light-theme');
+      }
+    });
+  </script>
+</body>
+
+</html>

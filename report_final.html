@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroVR - AI Analysis Report</title>
+    <style>
+        /* All the existing CSS styles remain unchanged */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: white;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #4f46e5, #06b6d4, #10b981, #f59e0b);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .report-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .overview .card-icon { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+        .physiological .card-icon { background: linear-gradient(135deg, #ef4444, #f97316); }
+        .cognitive .card-icon { background: linear-gradient(135deg, #10b981, #06b6d4); }
+        .behavioral .card-icon { background: linear-gradient(135deg, #f59e0b, #eab308); }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #94a3b8;
+            flex: 1;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            font-size: 16px;
+            color: #e2e8f0;
+            text-align: right;
+        }
+
+        .metric-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge-excellent { background: #10b98133; color: #10b981; border: 1px solid #10b981; }
+        .badge-good { background: #06b6d433; color: #06b6d4; border: 1px solid #06b6d4; }
+        .badge-moderate { background: #f59e0b33; color: #f59e0b; border: 1px solid #f59e0b; }
+        .badge-needs-attention { background: #ef444433; color: #ef4444; border: 1px solid #ef4444; }
+
+        .progress-container {
+            margin: 15px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease-out;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer-progress 2s infinite;
+        }
+
+        @keyframes shimmer-progress {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-style: italic;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .recommendations {
+            grid-column: 1 / -1;
+        }
+
+        .recommendation-item {
+            background: rgba(16, 185, 129, 0.05);
+            border-left: 4px solid #10b981;
+            border-radius: 0 12px 12px 0;
+            padding: 18px;
+            margin: 15px 0;
+            border-right: 1px solid rgba(16, 185, 129, 0.2);
+            border-top: 1px solid rgba(16, 185, 129, 0.1);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            color: #10b981;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .recommendation-text {
+            color: #cbd5e1;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .session-timeline {
+            grid-column: 1 / -1;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4f46e5;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-event {
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 4px;
+        }
+
+        .timeline-details {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #64748b;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .data-quality {
+            background: rgba(79, 70, 229, 0.05);
+            border-left: 4px solid #4f46e5;
+            border-radius: 0 12px 12px 0;
+            padding: 18px;
+            margin: 20px 0;
+            border-right: 1px solid rgba(79, 70, 229, 0.2);
+            border-top: 1px solid rgba(79, 70, 229, 0.1);
+            border-bottom: 1px solid rgba(79, 70, 229, 0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-color: #4f46e5;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            border-color: #10b981;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-meta {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Additional styles for charts */
+        .simple-chart {
+            height: 200px;
+            width: 100%;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        .chart-bar {
+            flex: 1;
+            margin: 0 2px;
+            background: linear-gradient(to top, #4f46e5, #06b6d4);
+            border-radius: 3px 3px 0 0;
+            position: relative;
+            transition: height 0.5s ease;
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            color: #94a3b8;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🧠 NeuroVR AI Analysis Report</div>
+            <div class="subtitle">Advanced Biometric & Behavioral Analysis</div>
+            <div class="report-meta">
+                <div class="meta-item">
+                    <span>📅</span>
+                    <span id="reportDate">Generated on March 15, 2024 at 2:34 PM</span>
+                </div>
+                <div class="meta-item">
+                    <span>👤</span>
+                    <span>Patient: John D.</span>
+                </div>
+                <div class="meta-item">
+                    <span>🎯</span>
+                    <span>Session ID: NVR-2024-0315-001</span>
+                </div>
+                <div class="meta-item">
+                    <span>⚡</span>
+                    <span>AI Analysis: Claude Sonnet 4</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card overview">
+                <div class="card-header">
+                    <h3 class="card-title">Session Overview</h3>
+                    <div class="card-icon">📊</div>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Therapy Type</span>
+                    <span class="metric-value" id="therapyType">Height Exposure Therapy</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Session Duration</span>
+                    <span class="metric-value" id="sessionDuration">12 minutes 34 seconds</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">VR Environment</span>
+                    <span class="metric-value">Skyscraper Observation Deck</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Difficulty Progressions</span>
+                    <span class="metric-value">3 adjustments</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Treatment Efficacy</span>
+                    <span class="metric-value">
+                        87%
+                        <span class="metric-badge badge-excellent">Excellent</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="card physiological">
+                <div class="card-header">
+                    <h3 class="card-title">Physiological Metrics</h3>
+                    <div class="card-icon">❤</div>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Average Heart Rate</span>
+                    <span class="metric-value" id="avgHeartRate">78.5 BPM</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Peak Heart Rate</span>
+                    <span class="metric-value">94 BPM</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Heart Rate Variability</span>
+                    <span class="metric-value">
+                        42ms
+                        <span class="metric-badge badge-good">Good</span>
+                    </span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span class="metric-label">Cardiovascular Adaptation</span>
+                        <span class="metric-value">82%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 82%; background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="simple-chart" id="heartRateChart"></div>
+                </div>
+            </div>
+
+            <div class="card cognitive">
+                <div class="card-header">
+                    <h3 class="card-title">Stress & Anxiety Analysis</h3>
+                    <div class="card-icon">🧠</div>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Average Stress Level</span>
+                    <span class="metric-value" id="avgStress">3.8/10</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Peak Stress Level</span>
+                    <span class="metric-value">6.2/10</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Stress Recovery Rate</span>
+                    <span class="metric-value">
+                        Fast
+                        <span class="metric-badge badge-excellent">Excellent</span>
+                    </span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span class="metric-label">Anxiety Reduction</span>
+                        <span class="metric-value">67%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 67%; background: linear-gradient(90deg, #10b981, #06b6d4);"></div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="simple-chart" id="stressChart"></div>
+                </div>
+            </div>
+
+            <div class="card behavioral">
+                <div class="card-header">
+                    <h3 class="card-title">Behavioral & Engagement</h3>
+                    <div class="card-icon">👁</div>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Engagement Score</span>
+                    <span class="metric-value" id="engagementScore">8.9/10</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Attention Focus</span>
+                    <span class="metric-value">
+                        High
+                        <span class="metric-badge badge-excellent">Excellent</span>
+                    </span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Avoidance Behaviors</span>
+                    <span class="metric-value">2 instances</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span class="metric-label">Exposure Tolerance</span>
+                        <span class="metric-value">89%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 89%; background: linear-gradient(90deg, #f59e0b, #eab308);"></div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="simple-chart" id="engagementChart"></div>
+                </div>
+            </div>
+
+            <div class="card" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                    <h3 class="card-title">Data Quality & Monitoring Statistics</h3>
+                    <div class="card-icon">📈</div>
+                </div>
+                <div class="data-quality">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div>
+                            <div class="metric-label">Heart Rate Samples</div>
+                            <div class="metric-value" id="hrSamples">367 readings</div>
+                        </div>
+                        <div>
+                            <div class="metric-label">Stress Measurements</div>
+                            <div class="metric-value" id="stressSamples">124 data points</div>
+                        </div>
+                        <div>
+                            <div class="metric-label">Eye Tracking Data</div>
+                            <div class="metric-value">2,847 coordinates</div>
+                        </div>
+                        <div>
+                            <div class="metric-label">Motion Analysis</div>
+                            <div class="metric-value">1,293 movements</div>
+                        </div>
+                        <div>
+                            <div class="metric-label">Data Accuracy</div>
+                            <div class="metric-value">98.7%</div>
+                        </div>
+                        <div>
+                            <div class="metric-label">Signal Quality</div>
+                            <div class="metric-value">Excellent</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card recommendations">
+                <div class="card-header">
+                    <h3 class="card-title">AI-Generated Recommendations</h3>
+                    <div class="card-icon">🎯</div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="recommendation-title">Therapeutic Progress Assessment</div>
+                    <div class="recommendation-text">
+                        Patient demonstrates excellent adaptation to VR exposure therapy with 67% anxiety reduction. 
+                        Physiological markers indicate successful habituation to height-related stimuli. Heart rate 
+                        stabilization occurred 40% faster than previous session.
+                    </div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="recommendation-title">Next Session Recommendations</div>
+                    <div class="recommendation-text">
+                        Advance to "Advanced Heights" difficulty level. Introduce wind effects and movement 
+                        simulation. Extend exposure time to 15 minutes. Patient shows readiness for increased 
+                        challenge based on stress recovery patterns.
+                    </div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="recommendation-title">Treatment Plan Adjustment</div>
+                    <div class="recommendation-text">
+                        Consider introducing real-world preparation exercises. Patient's virtual performance 
+                        suggests readiness for graduated in-vivo exposure. Schedule assessment session at 
+                        2-story building next week.
+                    </div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="recommendation-title">Long-term Monitoring</div>
+                    <div class="recommendation-text">
+                        Monitor for potential overconfidence patterns. Maintain regular physiological baseline 
+                        assessments. Track progress using standardized phobia assessment scales every 3 sessions.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card session-timeline">
+                <div class="card-header">
+                    <h3 class="card-title">Session Timeline & Events</h3>
+                    <div class="card-icon">⏱</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-event">Session Initiated</div>
+                        <div class="timeline-details">Patient entered VR environment - Ground level observation</div>
+                    </div>
+                    <div class="timeline-time">00:00</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-event">First Stress Peak</div>
+                        <div class="timeline-details">Heart rate increased to 89 BPM - Elevator simulation started</div>
+                    </div>
+                    <div class="timeline-time">02:15</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-event">Difficulty Adjustment</div>
+                        <div class="timeline-details">Therapist increased height to 20th floor - Patient adapted well</div>
+                    </div>
+                    <div class="timeline-time">04:30</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-event">Habituation Achieved</div>
+                        <div class="timeline-details">Stress levels stabilized - Engagement score peaked at 9.2</div>
+                    </div>
+                    <div class="timeline-time">06:45</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-event">Advanced Challenge</div>
+                        <div class="timeline-details">Glass floor activated - Brief anxiety spike managed successfully</div>
+                    </div>
+                    <div class="timeline-time">08:20</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-event">Session Completed</div>
+                        <div class="timeline-details">Gradual descent - Final stress level: 2.1/10</div>
+                    </div>
+                    <div class="timeline-time">12:34</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="downloadReport()">
+                📄 Download Detailed Report
+            </button>
+            <button class="btn btn-secondary" onclick="scheduleNext()">
+                📅 Schedule Next Session
+            </button>
+            <button class="btn" onclick="compareProgress()">
+                📊 Compare with Previous Sessions
+            </button>
+            <button class="btn" onclick="shareWithTeam()">
+                👥 Share with Treatment Team
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal for scheduling -->
+    <div id="scheduleModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('scheduleModal')">×</button>
+            <h2 class="modal-title">Schedule Next Session</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px;">Select Date & Time:</label>
+                <input type="datetime-local" id="sessionDateTime" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05); color: white;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px;">Session Type:</label>
+                <select id="sessionType" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05); color: white;">
+                    <option value="advanced_heights">Advanced Heights Exposure</option>
+                    <option value="wind_simulation">Heights with Wind Simulation</option>
+                    <option value="movement_challenge">Movement Challenge Scenario</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px;">Duration:</label>
+                <select id="sessionDuration" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05); color: white;">
+                    <option value="15">15 minutes</option>
+                    <option value="20">20 minutes</option>
+                    <option value="25">25 minutes</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="confirmSchedule()">Confirm Schedule</button>
+        </div>
+    </div>
+
+    <!-- Modal for comparison -->
+    <div id="compareModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('compareModal')">×</button>
+            <h2 class="modal-title">Session Comparison</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px;">Select Sessions to Compare:</label>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" name="sessionCompare" value="current" checked> Current Session (Mar 15, 2024)
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" name="sessionCompare" value="prev1"> Previous Session (Mar 10, 2024)
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" name="sessionCompare" value="prev2"> Session (Mar 5, 2024)
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" name="sessionCompare" value="prev3"> Session (Feb 28, 2024)
+                    </label>
+                </div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px;">Metrics to Compare:</label>
+                <select id="compareMetric" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05); color: white;">
+                    <option value="stress">Stress Levels</option>
+                    <option value="heart_rate">Heart Rate</option>
+                    <option value="engagement">Engagement Score</option>
+                    <option value="efficacy">Treatment Efficacy</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="generateComparison()">Generate Comparison</button>
+        </div>
+    </div>
+
+    <script>
+        // Set current date and time
+        document.getElementById('reportDate').textContent = 'Generated on ' + new Date().toLocaleString();
+
+        // Simulated real-time data structure for future integration
+        const sessionData = {
+            patient: {
+                id: "JD-2024-001",
+                name: "John D.",
+                age: 34,
+                phobiaType: "Acrophobia",
+                treatmentWeek: 6
+            },
+            session: {
+                id: "NVR-2024-0315-001",
+                date: new Date(),
+                duration: 754, // seconds
+                therapyType: "Height Exposure Therapy",
+                vrEnvironment: "Skyscraper Observation Deck",
+                difficultyLevel: "Intermediate → Advanced",
+                therapistNotes: "Excellent progress, ready for next level"
+            },
+            biometrics: {
+                heartRate: {
+                    samples: 367,
+                    average: 78.5,
+                    peak: 94,
+                    resting: 68,
+                    variability: 42,
+                    timeline: generateHeartRateData()
+                },
+                stressLevels: {
+                    samples: 124,
+                    average: 3.8,
+                    peak: 6.2,
+                    baseline: 2.1,
+                    recoveryRate: "fast",
+                    timeline: generateStressData()
+                },
+                galvanicSkinResponse: {
+                    samples: 445,
+                    average: 4.2,
+                    peak: 7.8,
+                    adaptationTime: 180 // seconds
+                }
+            },
+            behavioral: {
+                engagementScore: 8.9,
+                attentionFocus: "high",
+                avoidanceBehaviors: 2,
+                exposureTolerance: 89,
+                eyeTracking: {
+                    samples: 2847,
+                    fixationPoints: generateEyeTrackingData(),
+                    avoidancePatterns: 3
+                },
+                motionAnalysis: {
+                    headMovements: 1293,
+                    bodyStability: "good",
+                    retreatAttempts: 1
+                }
+            },
+            aiAnalysis: {
+                treatmentEfficacy: 87,
+                anxietyReduction: 67,
+                cardiovascularAdaptation: 82,
+                readinessForProgression: "high",
+                riskFactors: "none identified",
+                recommendations: [
+                    "Advance to next difficulty level",
+                    "Introduce wind effects simulation", 
+                    "Extend session duration to 15 minutes",
+                    "Prepare for in-vivo exposure assessment"
+                ]
+            },
+            dataQuality: {
+                overallAccuracy: 98.7,
+                signalQuality: "excellent",
+                missingDataPoints: 12,
+                calibrationStatus: "optimal",
+                sensorConnectivity: "stable"
+            }
+        };
+
+        function generateHeartRateData() {
+            // Simulate heart rate timeline for future chart integration
+            const data = [];
+            let baseRate = 68;
+            for (let i = 0; i < 754; i += 2) { // Every 2 seconds
+                let variation = Math.sin(i / 100) * 15 + Math.random() * 8 - 4;
+                if (i > 120 && i < 180) variation += 15; // Stress peak
+                if (i > 480 && i < 540) variation += 8; // Challenge peak
+                data.push({
+                    time: i,
+                    heartRate: Math.max(60, Math.min(110, baseRate + variation))
+                });
+            }
+            return data;
+        }
+
+        function generateStressData() {
+            // Simulate stress level timeline
+            const data = [];
+            let baseStress = 2.1;
+            for (let i = 0; i < 754; i += 2) {
+                let stress = baseStress;
+                
+                // Add peaks at specific times (matching timeline events)
+                if (i > 120 && i < 180) { // First stress peak
+                    stress += 4 * Math.exp(-Math.pow(i - 135, 2) / 200);
+                }
+                if (i > 480 && i < 540) { // Glass floor challenge
+                    stress += 3 * Math.exp(-Math.pow(i - 500, 2) / 200);
+                }
+                
+                // Add some general variation
+                stress += Math.sin(i / 50) * 0.5 + (Math.random() - 0.5) * 0.3;
+                
+                // Ensure stress is within 0-10 range
+                stress = Math.max(0, Math.min(10, stress));
+                
+                data.push({ time: i, stressLevel: parseFloat(stress.toFixed(1)) });
+            }
+            return data;
+        }
+
+        function generateEyeTrackingData() {
+            // Simulate eye tracking data
+            return Array.from({length: 50}, () => ({
+                x: Math.random() * 100,
+                y: Math.random() * 100,
+                timestamp: Math.random() * 754
+            }));
+        }
+
+        // Create simple charts for visualization
+        function createSimpleCharts() {
+            // Heart rate chart
+            const hrChart = document.getElementById('heartRateChart');
+            const hrData = sessionData.biometrics.heartRate.timeline
+                .filter((_, i) => i % 20 === 0) // Sample data points
+                .slice(0, 20); // Limit number of bars
+            
+            hrData.forEach((data, i) => {
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = `${(data.heartRate - 60) / 50 * 180 + 20}px`; // Scale to chart height
+                bar.title = `Time: ${Math.floor(data.time/60)}:${(data.time%60).toString().padStart(2, '0')} - ${data.heartRate.toFixed(1)} BPM`;
+                
+                const label = document.createElement('div');
+                label.className = 'chart-bar-label';
+                label.textContent = `${Math.floor(data.time/60)}:${(data.time%60).toString().padStart(2, '0')}`;
+                
+                bar.appendChild(label);
+                hrChart.appendChild(bar);
+            });
+
+            // Stress chart
+            const stressChart = document.getElementById('stressChart');
+            const stressData = sessionData.biometrics.stressLevels.timeline
+                .filter((_, i) => i % 20 === 0) // Sample data points
+                .slice(0, 20); // Limit number of bars
+            
+            stressData.forEach((data, i) => {
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = `${data.stressLevel / 10 * 180}px`; // Scale to chart height
+                bar.style.background = 'linear-gradient(to top, #10b981, #06b6d4)';
+                bar.title = `Time: ${Math.floor(data.time/60)}:${(data.time%60).toString().padStart(2, '0')} - ${data.stressLevel.toFixed(1)}/10`;
+                
+                const label = document.createElement('div');
+                label.className = 'chart-bar-label';
+                label.textContent = `${Math.floor(data.time/60)}:${(data.time%60).toString().padStart(2, '0')}`;
+                
+                bar.appendChild(label);
+                stressChart.appendChild(bar);
+            });
+
+            // Engagement chart (simulated)
+            const engagementChart = document.getElementById('engagementChart');
+            for (let i = 0; i < 20; i++) {
+                const time = i * 40;
+                const engagement = 7 + Math.sin(i/3) * 1.5 + Math.random() * 0.5;
+                
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = `${engagement / 10 * 180}px`;
+                bar.style.background = 'linear-gradient(to top, #f59e0b, #eab308)';
+                bar.title = `Time: ${Math.floor(time/60)}:${(time%60).toString().padStart(2, '0')} - ${engagement.toFixed(1)}/10`;
+                
+                const label = document.createElement('div');
+                label.className = 'chart-bar-label';
+                label.textContent = `${Math.floor(time/60)}:${(time%60).toString().padStart(2, '0')}`;
+                
+                bar.appendChild(label);
+                engagementChart.appendChild(bar);
+            }
+        }
+
+        // Button action functions
+        function downloadReport() {
+            // In a real implementation, this would generate a PDF or download data
+            alert('Downloading detailed report...\nA PDF report will be generated with all session data.');
+            
+            // Simulate download process
+            setTimeout(() => {
+                alert('Report downloaded successfully!');
+            }, 1500);
+        }
+
+        function scheduleNext() {
+            // Show scheduling modal
+            document.getElementById('scheduleModal').style.display = 'flex';
+            
+            // Set default date to next week
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            document.getElementById('sessionDateTime').value = nextWeek.toISOString().slice(0, 16);
+        }
+
+        function compareProgress() {
+            // Show comparison modal
+            document.getElementById('compareModal').style.display = 'flex';
+        }
+
+        function shareWithTeam() {
+            // In a real implementation, this would integrate with email or messaging systems
+            alert('Sharing report with treatment team...\nThis would typically open your email client with a precomposed message.');
+        }
+
+        // Modal functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function confirmSchedule() {
+            const dateTime = document.getElementById('sessionDateTime').value;
+            const sessionType = document.getElementById('sessionType').value;
+            const duration = document.getElementById('sessionDuration').value;
+            
+            alert(`Session scheduled!\nDate: ${new Date(dateTime).toLocaleString()}\nType: ${sessionType}\nDuration: ${duration} minutes`);
+            closeModal('scheduleModal');
+        }
+
+        function generateComparison() {
+            const selectedSessions = Array.from(document.querySelectorAll('input[name="sessionCompare"]:checked')).map(input => input.value);
+            const metric = document.getElementById('compareMetric').value;
+            
+            alert(`Generating comparison for ${selectedSessions.join(', ')} sessions\nMetric: ${metric}`);
+            closeModal('compareModal');
+            
+            // In a real implementation, this would show a visual comparison
+        }
+
+        // Initialize charts when page loads
+        window.addEventListener('load', createSimpleCharts);
+    </script>
+</body>
+</html>

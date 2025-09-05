@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Therapeutic Exercises</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4A6CF7;
+            --secondary: #6C757D;
+            --accent: #3E60D5;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --success: #47BD9A;
+            --warning: #FFC107;
+            --danger: #DC3545;
+            --info: #17A2B8;
+            --heights: #FF6B6B;
+            --darkness: #4A6CF7;
+            --ptsd: #47BD9A;
+            --common: #6C757D;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7ff 0%, #e0e7ff 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: var(--accent);
+            color: white;
+        }
+
+        .exercise-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .exercise-section.active {
+            display: block;
+        }
+
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .exercise-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .exercise-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .exercise-header {
+            padding: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .heights-header {
+            background: linear-gradient(135deg, var(--heights), #FF8E8E);
+        }
+
+        .darkness-header {
+            background: linear-gradient(135deg, var(--darkness), #6C8DFF);
+        }
+
+        .ptsd-header {
+            background: linear-gradient(135deg, var(--ptsd), #6DDEBB);
+        }
+
+        .common-header {
+            background: linear-gradient(135deg, var(--common), #8E9BA7);
+        }
+
+        .exercise-icon {
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .exercise-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .exercise-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .exercise-purpose {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .exercise-description {
+            margin-bottom: 15px;
+            color: var(--dark);
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        /* Demo Container */
+        .demo-container {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .demo-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .demo-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .animation-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Breathing Animation */
+        .breathing-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin: 0 auto;
+            animation: breathe 8s infinite ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(0.8); background: #4A6CF7; }
+            25% { transform: scale(1.5); background: #3E60D5; }
+            50% { transform: scale(1.5); background: #3E60D5; }
+            75% { transform: scale(0.8); background: #4A6CF7; }
+            100% { transform: scale(0.8); background: #4A6CF7; }
+        }
+
+        /* Grounding Animation */
+        .grounding-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .foot-container {
+            display: flex;
+            gap: 40px;
+        }
+
+        .foot {
+            width: 80px;
+            height: 120px;
+            background: #6C757D;
+            border-radius: 40px;
+            position: relative;
+            animation: ground 4s infinite ease-in-out;
+        }
+
+        .foot:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes ground {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* Sensory Amplification */
+        .sensory-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .sense {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--darkness);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        .sense:nth-child(2) {
+            background: var(--ptsd);
+            animation-delay: 0.5s;
+        }
+
+        .sense:nth-child(3) {
+            background: var(--heights);
+            animation-delay: 1s;
+        }
+
+        .sense:nth-child(4) {
+            background: var(--common);
+            animation-delay: 1.5s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+           100% { transform: scale(1); }
+        }
+
+        /* Vision Expansion */
+        .vision-container {
+            width: 300px;
+            height: 300px;
+            position: relative;
+        }
+
+        .vision-focus {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(74, 108, 247, 0.5);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: focus 6s infinite;
+        }
+
+        .vision-peripheral {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px dashed var(--darkness);
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: expand 6s infinite;
+        }
+
+        @keyframes focus {
+            0%, 30% { width: 100px; height: 100px; opacity: 0.8; }
+            50%, 80% { width: 200px; height: 200px; opacity: 0.4; }
+            100% { width: 100px; height: 100px; opacity: 0.8; }
+        }
+
+        @keyframes expand {
+            0%, 30% { width: 100%; height: 100%; opacity: 0.3; }
+            50%, 80% { width: 130%; height: 130%; top: -15%; left: -15%; opacity: 0.6; }
+            100% { width: 100%; height: 100%; opacity: 0.3; }
+        }
+
+        /* Light Control */
+        .light-container {
+            width: 300px;
+            height: 200px;
+            background: #000;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .light-bulb {
+            width: 60px;
+            height: 60px;
+            background: #FFD700;
+            border-radius: 50%;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 50px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .light-slider {
+            width: 80%;
+            margin: 140px auto 0;
+        }
+
+        .light-slider input {
+            width: 100%;
+        }
+
+        /* Anchoring */
+        .anchoring-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .anchor-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: appear 0.5s forwards;
+            opacity: 0;
+        }
+
+        .anchor-item:nth-child(1) { animation-delay: 0.5s; }
+        .anchor-item:nth-child(2) { animation-delay: 1s; }
+        .anchor-item:nth-child(3) { animation-delay: 1.5s; }
+        .anchor-item:nth-child(4) { animation-delay: 2s; }
+        .anchor-item:nth-child(5) { animation-delay: 2.5s; }
+
+        @keyframes appear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Safe Space */
+        .safe-space-container {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #87CEEB, #E0F7FA);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .safe-sun {
+            width: 80px;
+            height: 80px;
+            background: #FFD700;
+            border-radius: 50%;
+            position: absolute;
+            top: 30px;
+            right: 30px;
+        }
+
+        .safe-mountain {
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 100px solid #4CAF50;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .safe-water {
+            width: 100%;
+            height: 50px;
+            background: #2196F3;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        /* Narrative */
+        .narrative-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .narrative-textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 16px;
+            resize: none;
+        }
+
+        .narrative-button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: var(--ptsd);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* PMR */
+        .pmr-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            max-width: 420px;
+            margin: 0 auto;
+            align-items: stretch;
+        }
+
+        .pmr-muscle {
+            padding: 15px 10px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            animation: tense 4s infinite;
+            gap: 12px;
+        }
+
+        .pmr-muscle span {
+            flex: 1;
+            text-align: left;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .pmr-muscle i {
+            flex-shrink: 0;
+            font-size: 22px;
+            margin-left: 8px;
+        }
+
+        @keyframes tense {
+            0%, 60% { background: white; }
+            70%, 80% { background: #FFE0B2; }
+            90%, 100% { background: white; }
+        }
+
+        /* Mindful Observation */
+        .observation-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .observation-object {
+            width: 120px;
+            height: 120px;
+            background: var(--common);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .observation-details {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            transform: translateY(100%);
+            transition: transform 0.5s;
+        }
+
+        .observation-object:hover .observation-details {
+            transform: translateY(0);
+        }
+
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* Back button */
+        .back-button {
+            padding: 12px 25px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .back-button:hover {
+            background: var(--accent);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--secondary);
+            margin-top: 40px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Instructions styling */
+        #demo-instructions {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        #demo-instructions ol {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+
+        #demo-instructions li {
+            margin-bottom: 8px;
+        }
+
+        #demo-instructions p {
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .exercise-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .animation-container {
+                height: 250px;
+            }
+            
+            .vision-container {
+                width: 250px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Interactive Therapeutic Exercises</h1>
+            <p class="subtitle">Visual guides to help you practice techniques without videos</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-target="heights">
+                <i class="fas fa-mountain"></i> Fear of Heights
+            </button>
+            <button class="tab" data-target="darkness">
+                <i class="fas fa-moon"></i> Fear of Darkness
+            </button>
+            <button class="tab" data-target="ptsd">
+                <i class="fas fa-heartbeat"></i> PTSD
+            </button>
+            <button class="tab" data-target="common">
+                <i class="fas fa-star"></i> Common Exercises
+            </button>
+        </div>
+
+        <!-- FEAR OF HEIGHTS EXERCISES -->
+        <div id="heights" class="exercise-section active">
+            <h2>Exercises for Fear of Heights</h2>
+            <p class="subtitle">Click on an exercise to see an interactive demonstration</p>
+            
+            <div class="exercise-grid">
+                <div class="exercise-card" data-exercise="breathing">
+                    <div class="exercise-header heights-header">
+                        <div class="exercise-icon"><i class="fas fa-wind"></i></div>
+                        <div class="exercise-title">Controlled Breathing</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Manage acute anxiety</div>
+                        <div class="exercise-description">
+                            <p>Follow the breathing pattern to calm your nervous system when facing heights.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card" data-exercise="grounding">
+                    <div class="exercise-header heights-header">
+                        <div class="exercise-icon"><i class="fas fa-shoe-prints"></i></div>
+                        <div class="exercise-title">Grounded Stance</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Counteract instability</div>
+                        <div class="exercise-description">
+                            <p>Practice this stance to feel more stable and secure in high places.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card" data-exercise="reframing">
+                    <div class="exercise-header heights-header">
+                        <div class="exercise-icon"><i class="fas fa-brain"></i></div>
+                        <div class="exercise-title">Cognitive Reframing</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Challenge fearful thoughts</div>
+                        <div class="exercise-description">
+                            <p>Learn to reframe anxious thoughts about heights into more balanced perspectives.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FEAR OF DARKNESS EXERCISES -->
+        <div id="darkness" class="exercise-section">
+            <h2>Exercises for Fear of Darkness</h2>
+            <p class="subtitle">Click on an exercise to see an interactive demonstration</p>
+            
+            <div class="exercise-grid">
+                <div class="exercise-card" data-exercise="sensory">
+                    <div class="exercise-header darkness-header">
+                        <div class="exercise-icon"><i class="fas fa-ear"></i></div>
+                        <div class="exercise-title">Sensory Amplification</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Shift focus from darkness</div>
+                        <div class="exercise-description">
+                            <p>Redirect attention from absence of light to other sensory experiences.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card" data-exercise="vision">
+                    <div class="exercise-header darkness-header">
+                        <div class="exercise-icon"><i class="fas fa-eye"></i></div>
+                        <div class="exercise-title">Peripheral Vision</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Reduce hyper-vigilance</div>
+                        <div class="exercise-description">
+                            <p>Expand your peripheral vision to counteract tunnel vision in darkness.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card" data-exercise="light">
+                    <div class="exercise-header darkness-header">
+                        <div class="exercise-icon"><i class="fas fa-lightbulb"></i></div>
+                        <div class="exercise-title">Light Control</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Build empowerment</div>
+                        <div class="exercise-description">
+                            <p>Gradually increase tolerance to darkness while maintaining control.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PTSD EXERCISES -->
+        <div id="ptsd" class="exercise-section">
+            <h2>Exercises for PTSD</h2>
+            <p class="subtitle">Click on an exercise to see an interactive demonstration</p>
+            
+            <div class="exercise-grid">
+                <div class="exercise-card" data-exercise="anchoring">
+                    <div class="exercise-header ptsd-header">
+                        <div class="exercise-icon"><i class="fas fa-anchor"></i></div>
+                        <div class="exercise-title">Present-Moment Anchoring</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Prevent flashbacks</div>
+                        <div class="exercise-description">
+                            <p>Re-engage with the present reality when experiencing PTSD symptoms.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card" data-exercise="safe">
+                    <div class="exercise-header ptsd-header">
+                        <div class="exercise-icon"><i class="fas fa-home"></i></div>
+                        <div class="exercise-title">Safe Space Visualization</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Create mental escape</div>
+                        <div class="exercise-description">
+                            <p>Develop and access a mental sanctuary when triggers become overwhelming.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card" data-exercise="narrative">
+                    <div class="exercise-header ptsd-header">
+                        <div class="exercise-icon"><i class="fas fa-book"></i></div>
+                        <div class="exercise-title">Narrative Coherence</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Process memories</div>
+                        <div class="exercise-description">
+                            <p>Reframe traumatic experiences as completed events rather than ongoing threats.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMMON EXERCISES -->
+        <div id="common" class="exercise-section">
+            <h2>Common Exercises for All Phobias</h2>
+            <p class="subtitle">Click on an exercise to see an interactive demonstration</p>
+            
+            <div class="exercise-grid">
+                <div class="exercise-card" data-exercise="diaphragmatic">
+                    <div class="exercise-header common-header">
+                        <div class="exercise-icon"><i class="fas fa-lungs"></i></div>
+                        <div class="exercise-title">Diaphragmatic Breathing</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Regulate nervous system</div>
+                        <div class="exercise-description">
+                            <p>Deep breathing technique to lower baseline anxiety and manage stress.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card" data-exercise="pmr">
+                    <div class="exercise-header common-header">
+                        <div class="exercise-icon"><i class="fas fa-hands"></i></div>
+                        <div class="exercise-title">Muscle Relaxation</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Release tension</div>
+                        <div class="exercise-description">
+                            <p>Systematically tense and release muscle groups to reduce physical anxiety.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card" data-exercise="observation">
+                    <div class="exercise-header common-header">
+                        <div class="exercise-icon"><i class="fas fa-binoculars"></i></div>
+                        <div class="exercise-title">Mindful Observation</div>
+                    </div>
+                    <div class="exercise-body">
+                        <div class="exercise-purpose"><i class="fas fa-bullseye"></i> Ground in present</div>
+                        <div class="exercise-description">
+                            <p>Divert attention from anxious thoughts to external, neutral stimuli.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEMO CONTAINER -->
+        <div id="demo-container" class="demo-container">
+            <h2 class="demo-title" id="demo-title">Exercise Demonstration</h2>
+            <div class="animation-container" id="animation-container">
+                <!-- Animation will be inserted here by JavaScript -->
+            </div>
+            <div id="demo-instructions">
+                <!-- Instructions will be inserted here by JavaScript -->
+            </div>
+            <button class="back-button" id="back-button"><i class="fas fa-arrow-left"></i> Back to Exercises</button>
+        </div>
+
+        <div class="footer">
+            <p>Interactive Therapeutic Exercises | NeuroVR Therapy System</p>
+            <p>These visual guides help you practice techniques without the need for videos</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabs = document.querySelectorAll('.tab');
+            const sections = document.querySelectorAll('.exercise-section');
+            const demoContainer = document.getElementById('demo-container');
+            const animationContainer = document.getElementById('animation-container');
+            const demoTitle = document.getElementById('demo-title');
+            const demoInstructions = document.getElementById('demo-instructions');
+            const backButton = document.getElementById('back-button');
+            
+            // Track active tab
+            let activeTab = 'heights';
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-target');
+                    activeTab = target;
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show target section
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === target) {
+                            section.classList.add('active');
+                        }
+                    });
+                    
+                    // Hide demo container if showing
+                    demoContainer.classList.remove('active');
+                });
+            });
+            
+            // Exercise card click functionality
+            const exerciseCards = document.querySelectorAll('.exercise-card');
+            exerciseCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const exercise = card.getAttribute('data-exercise');
+                    showExerciseDemo(exercise);
+                });
+            });
+            
+            // Back button functionality
+            backButton.addEventListener('click', () => {
+                demoContainer.classList.remove('active');
+                
+                // Show the previously active tab section
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === activeTab) {
+                        section.classList.add('active');
+                    }
+                });
+                
+                // Scroll to the top of the exercises section
+                document.querySelector('#' + activeTab).scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Function to show exercise demonstration
+            function showExerciseDemo(exercise) {
+                // Hide all exercise sections
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show demo container
+                demoContainer.classList.add('active');
+                
+                // Clear previous animation
+                animationContainer.innerHTML = '';
+                demoInstructions.innerHTML = '';
+                
+                // Set up the specific exercise demo
+                switch(exercise) {
+                    case 'breathing':
+                        demoTitle.textContent = 'Controlled Breathing Exercise';
+                        animationContainer.innerHTML = `
+                            <div class="breathing-circle" id="breathing-circle">INHALE</div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Follow the animation to practice controlled breathing:</p>
+                            <ol>
+                                <li>Inhale slowly for 4 seconds as the circle expands</li>
+                                <li>Hold your breath for 4 seconds while the circle remains large</li>
+                                <li>Exhale slowly for 6 seconds as the circle contracts</li>
+                                <li>Repeat this cycle 5-10 times</li>
+                            </ol>
+                            <p>This technique helps calm your nervous system during anxious moments.</p>
+                        `;
+                        // Controlled Breathing: INHALE (0-4s), HOLD (4-8s), EXHALE (8-14s)
+                        const breathingCircle = document.getElementById('breathing-circle');
+                        const updateBreathText = () => {
+                            const time = Date.now() % 14000;
+                            if (time < 4000) {
+                                breathingCircle.textContent = 'INHALE';
+                            } else if (time < 8000) {
+                                breathingCircle.textContent = 'HOLD';
+                            } else {
+                                breathingCircle.textContent = 'EXHALE';
+                            }
+                            requestAnimationFrame(updateBreathText);
+                        };
+                        updateBreathText();
+                        break;
+                        
+                    case 'grounding':
+                        demoTitle.textContent = 'Grounded Stance Practice';
+                        animationContainer.innerHTML = `
+                            <div class="grounding-container">
+                                <div class="foot-container">
+                                    <div class="foot"></div>
+                                    <div class="foot"></div>
+                                </div>
+                                <div class="balance-indicator">
+                                    <i class="fas fa-circle" style="font-size: 48px; color: #47BD9A;"></i>
+                                </div>
+                            </div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Practice this grounding stance to feel more stable:</p>
+                            <ol>
+                                <li>Stand with your feet shoulder-width apart</li>
+                                <li>Distribute your weight evenly between both feet</li>
+                                <li>Feel the connection between your feet and the ground</li>
+                                <li>Slightly bend your knees to improve stability</li>
+                                <li>Practice shifting weight gently from side to side</li>
+                            </ol>
+                            <p>This exercise helps counteract feelings of instability when at heights.</p>
+                        `;
+                        break;
+                        
+                    case 'reframing':
+                        demoTitle.textContent = 'Cognitive Reframing Exercise';
+                        animationContainer.innerHTML = `
+                            <div style="width: 100%; max-width: 400px;">
+                                <div style="background: #FF6B6B; color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; transition: all 0.5s ease;">
+                                    <p style="font-weight: bold; margin: 0;">"I'm going to fall!"</p>
+                                </div>
+                                <div style="font-size: 48px; margin: 20px 0;">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                                <div style="background: #47BD9A; color: white; padding: 20px; border-radius: 12px; transition: all 0.5s ease;">
+                                    <p style="font-weight: bold; margin: 0;">"I'm safe and secure on this stable surface."</p>
+                                </div>
+                            </div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Practice reframing anxious thoughts about heights:</p>
+                            <ol>
+                                <li>Identify the anxious thought (e.g., "I'm going to fall!")</li>
+                                <li>Challenge its validity - is there evidence for this thought?</li>
+                                <li>Replace it with a more balanced, realistic thought</li>
+                                <li>Repeat the new thought several times to reinforce it</li>
+                            </ol>
+                            <p>This technique helps rewire your brain's response to height-related stimuli.</p>
+                        `;
+                        break;
+                        
+                    case 'sensory':
+                        demoTitle.textContent = 'Sensory Amplification Exercise';
+                        animationContainer.innerHTML = `
+                            <div class="sensory-container">
+                                <div class="sense"><i class="fas fa-ear"></i></div>
+                                <div class="sense"><i class="fas fa-hand"></i></div>
+                                <div class="sense"><i class="fas fa-eye"></i></div>
+                                <div class="sense"><i class="fas fa-wind"></i></div>
+                            </div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Practice shifting focus from darkness to other senses:</p>
+                            <ol>
+                                <li>Close your eyes and focus on ambient sounds around you</li>
+                                <li>Identify and name each sound you can detect</li>
+                                <li>Pay attention to tactile sensations (clothing, chair, etc.)</li>
+                                <li>Notice your breathing rhythm and body temperature</li>
+                                <li>Describe these sensations to yourself mentally</li>
+                            </ol>
+                            <p>This technique helps redirect attention from fear of darkness to neutral sensory experiences.</p>
+                        `;
+                        break;
+                        
+                    case 'vision':
+                        demoTitle.textContent = 'Peripheral Vision Expansion';
+                        animationContainer.innerHTML = `
+                            <div class="vision-container">
+                                <div class="vision-peripheral"></div>
+                                <div class="vision-focus"></div>
+                            </div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Practice expanding your peripheral vision:</p>
+                            <ol>
+                                <li>Consciously relax your gaze in the dark environment</li>
+                                <li>Try to notice the outermost edges of your visual field</li>
+                                <li>Without moving your eyes, expand your awareness</li>
+                                <li>Practice soft focus rather than intense staring</li>
+                                <li>Notice how this reduces feelings of tension</li>
+                            </ol>
+                            <p>This exercise helps counter the narrowed focus that often occurs in darkness.</p>
+                        `;
+                        break;
+                        
+                    case 'light':
+                        demoTitle.textContent = 'Gradual Light Control Exposure';
+                        animationContainer.innerHTML = `
+                            <div class="light-container">
+                                <div class="light-bulb"></div>
+                                <div class="light-slider">
+                                    <input type="range" min="0" max="100" value="100" id="light-slider">
+                                </div>
+                            </div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Practice gradually increasing tolerance to darkness:</p>
+                            <ol>
+                                <li>Use the slider to adjust the light intensity</li>
+                                <li>Start with maximum brightness and get comfortable</li>
+                                <li>Gradually decrease the light in small steps</li>
+                                <li>Stay at each level until your anxiety reduces</li>
+                                <li>If overwhelmed, return to a brighter level</li>
+                            </ol>
+                            <p>This technique builds empowerment and sense of agency in dark environments.</p>
+                        `;
+                        
+                        // Add functionality to the light slider
+                        const lightSlider = document.getElementById('light-slider');
+                        const lightBulb = document.querySelector('.light-bulb');
+                        lightSlider.addEventListener('input', function() {
+                            const value = this.value;
+                            lightBulb.style.boxShadow = `0 0 ${value/2}px ${value/5}px rgba(255, 215, 0, ${value/200})`;
+                            lightBulb.style.opacity = value/100;
+                        });
+                        break;
+                        
+                    case 'anchoring':
+                        demoTitle.textContent = 'Present-Moment Anchoring';
+                        animationContainer.innerHTML = `
+                            <div class="anchoring-container">
+                                <div class="anchor-item">
+                                    <i class="fas fa-1" style="color: var(--ptsd);"></i>
+                                    <span>Name three things you can feel right now</span>
+                                </div>
+                                <div class="anchor-item">
+                                    <i class="fas fa-2" style="color: var(--ptsd);"></i>
+                                    <span>Identify two things you can hear</span>
+                                </div>
+                                <div class="anchor-item">
+                                    <i class="fas fa-3" style="color: var(--ptsd);"></i>
+                                    <span>Notice one thing you can see in detail</span>
+                                </div>
+                                <div class="anchor-item">
+                                    <i class="fas fa-4" style="color: var(--ptsd);"></i>
+                                    <span>Focus on your breath moving in and out</span>
+                                </div>
+                                <div class="anchor-item">
+                                    <i class="fas fa-5" style="color: var(--ptsd);"></i>
+                                    <span>Repeat a grounding phrase: "I am here now"</span>
+                                </div>
+                            </div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Use this technique to re-engage with the present reality:</p>
+                            <ol>
+                                <li>Practice this sequence when you feel symptoms arising</li>
+                                <li>Go through each step deliberately and mindfully</li>
+                                <li>Spend at least 10-15 seconds on each step</li>
+                                <li>Repeat the sequence if needed until you feel grounded</li>
+                            </ol>
+                            <p>This emergency technique helps prevent or interrupt flashbacks and dissociation.</p>
+                        `;
+                        break;
+                        
+                    case 'safe':
+                        demoTitle.textContent = 'Safe Space Visualization';
+                        animationContainer.innerHTML = `
+                            <div class="safe-space-container">
+                                <div class="safe-sun"></div>
+                                <div class="safe-mountain"></div>
+                                <div class="safe-water"></div>
+                            </div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Practice creating and accessing your mental safe space:</p>
+                            <ol>
+                                <li>Before sessions, practice visualizing a detailed safe place</li>
+                                <li>Include all sensory details (sights, sounds, smells)</li>
+                                <li>During distress, close your eyes and visit this mental space</li>
+                                <li>Stay there until your physiology calms down</li>
+                                <li>Return to the present feeling more regulated</li>
+                            </ol>
+                            <p>This exercise helps create a mental escape hatch during overwhelm.</p>
+                        `;
+                        break;
+                        
+                    case 'narrative':
+                        demoTitle.textContent = 'Narrative Coherence Prompting';
+                        animationContainer.innerHTML = `
+                            <div class="narrative-container">
+                                <textarea class="narrative-textarea" placeholder="Describe what happened in the third person..."></textarea>
+                                <button class="narrative-button">Save Narrative</button>
+                            </div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Practice processing experiences through narrative:</p>
+                            <ol>
+                                <li>After an exposure segment, verbally narrate what happened</li>
+                                <li>Use the third person (e.g., "The person in the scenario...")</li>
+                                <li>Describe events in chronological order</li>
+                                <li>Focus on facts rather than emotions</li>
+                                <li>End with a statement about safety in the present</li>
+                            </ol>
+                            <p>This technique helps reframe traumatic experiences as completed events.</p>
+                        `;
+                        break;
+                        
+                    case 'diaphragmatic':
+                        demoTitle.textContent = 'Diaphragmatic Breathing';
+                        animationContainer.innerHTML = `
+                            <div class="breathing-circle" id="diaphragmatic-circle">INHALE</div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Practice diaphragmatic breathing to regulate your nervous system:</p>
+                            <ol>
+                                <li>Place one hand on your chest, the other on your abdomen</li>
+                                <li>Inhale slowly through your nose for 4 seconds</li>
+                                <li>Feel your abdomen expand while your chest remains still</li>
+                                <li>Hold for 4 seconds</li>
+                                <li>Exhale slowly through your mouth for 6 seconds</li>
+                                <li>Repeat for 5-10 cycles, multiple times daily</li>
+                            </ol>
+                            <p>This is the foundational breathing technique for anxiety management.</p>
+                        `;
+                        // Diaphragmatic Breathing: INHALE (0-4s), HOLD (4-8s), EXHALE (8-14s)
+                        const diaphragmaticCircle = document.getElementById('diaphragmatic-circle');
+                        const updateDiaphragmaticText = () => {
+                            const time = Date.now() % 14000;
+                            if (time < 4000) {
+                                diaphragmaticCircle.textContent = 'INHALE';
+                            } else if (time < 8000) {
+                                diaphragmaticCircle.textContent = 'HOLD';
+                            } else {
+                                diaphragmaticCircle.textContent = 'EXHALE';
+                            }
+                            requestAnimationFrame(updateDiaphragmaticText);
+                        };
+                        updateDiaphragmaticText();
+                        break;
+                        
+                    case 'pmr':
+                        demoTitle.textContent = 'Progressive Muscle Relaxation';
+                        animationContainer.innerHTML = `
+                            <div class="pmr-container">
+                                <div class="pmr-muscle">
+                                    <span>Feet</span>
+                                    <i class="fas fa-foot" style="color: var(--common);"></i>
+                                </div>
+                                <div class="pmr-muscle">
+                                    <span>Calves</span>
+                                    <i class="fas fa-leg" style="color: var(--common);"></i>
+                                </div>
+                                <div class="pmr-muscle">
+                                    <span>Thighs</span>
+                                    <i class="fas fa-walking" style="color: var(--common);"></i>
+                                </div>
+                                <div class="pmr-muscle">
+                                    <span>Hands & Arms</span>
+                                    <i class="fas fa-hand-paper" style="color: var(--common);"></i>
+                                </div>
+                                <div class="pmr-muscle">
+                                    <span>Shoulders & Neck</span>
+                                    <i class="fas fa-user" style="color: var(--common);"></i>
+                                </div>
+                                <div class="pmr-muscle">
+                                    <span>Face</span>
+                                    <i class="fas fa-smile" style="color: var(--common);"></i>
+                                </div>
+                            </div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Practice progressive muscle relaxation to release tension:</p>
+                            <ol>
+                                <li>Start with your feet, tense muscles for 5 seconds</li>
+                                <li>Release suddenly and notice the sensation of relaxation</li>
+                                <li>Move upward to calves, thighs, abdomen, hands, arms</li>
+                                <li>Continue to shoulders, neck, and facial muscles</li>
+                                <li>Practice daily for 10-15 minutes</li>
+                            </ol>
+                            <p>This technique helps recognize and release muscle tension that accompanies anxiety.</p>
+                        `;
+                        break;
+                        
+                    case 'observation':
+                        demoTitle.textContent = 'Mindful Observation';
+                        animationContainer.innerHTML = `
+                            <div class="observation-container">
+                                <div class="observation-object">
+                                    <div class="observation-details">
+                                        <p>Texture: Smooth</p>
+                                        <p>Color: Blue</p>
+                                        <p>Shape: Rectangular</p>
+                                    </div>
+                                </div>
+                                <div class="timer">02:00</div>
+                            </div>
+                        `;
+                        demoInstructions.innerHTML = `
+                            <p>Practice mindful observation to ground in the present:</p>
+                            <ol>
+                                <li>Select a neutral object in your environment</li>
+                                <li>Focus on it intently for 1-2 minutes</li>
+                                <li>Notice its color, shape, texture, and other qualities</li>
+                                <li>If your mind wanders, gently return focus to the object</li>
+                                <li>Practice this daily with different objects</li>
+                            </ol>
+                            <p>This mindfulness practice diverts attention from internal anxious thoughts.</p>
+                        `;
+                        
+                        // Timer functionality
+                        let timeLeft = 120;
+                        const timerElement = document.querySelector('.timer');
+                        const timerInterval = setInterval(() => {
+                            timeLeft--;
+                            const minutes = Math.floor(timeLeft / 60);
+                            const seconds = timeLeft % 60;
+                            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                            
+                            if (timeLeft <= 0) {
+                                clearInterval(timerInterval);
+                                timerElement.textContent = "Time's up!";
+                            }
+                        }, 1000);
+                        break;
+                }
+                
+                // Scroll to demo container
+                demoContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
